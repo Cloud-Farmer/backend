@@ -1,0 +1,55 @@
+version: '3.8'
+services:
+  backend:
+    image: smartfarm-be:latest
+    ports:
+      - "18080:8080"
+    restart: always
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql5.7:3306/testdb?useSSL=false&serverTimezone=UTC&useLegacyDatetimeCode=false
+      SPRING_DATASOURCE_USERNAME: "root"
+      SPRING_DATASOURCE_PASSWORD: "1257"
+    depends_on:
+      - influxdb
+      - mysql
+
+  influxdb:
+    container_name: influxdb
+    image: influxdb:1.8.10
+    ports:
+      - "8086:8086"
+    hostname: influxdb
+    environment:
+      - INFLUXDB_DB:test
+      - INFLUXDB_ADMIN_USER:admin
+      - INFLUXDB_ADMIN_PASSWORD=12345
+      - INFLUXDB_HTTP_AUTH_ENABLED=false
+      - INFLUXDB_HTTP_FLUX_ENABLED=true
+      - INFLUXDB_RETENTION_CHECK_INTERVAL=24h
+      - INFLUXDB_HTTP_LOG_ENABLED:true
+      - INFLUXDB_RETENTION_ENABLED:true
+      - INFLUXDB_SHARD_PRECREATION_ENABLED:true
+    volumes:
+      - ./influxdb:/var/lib/influxdb
+  mysql:
+    container_name: mysql5.7
+    image: library/mysql:5.7
+    platform: linux/amd64
+    volumes:
+      - db_datas:/var/lib/mysql
+      - ./db/mysql/init:/docker-entrypoint-initdb.d
+    hostname: mysql
+    environment:
+      MYSQL_DATABASE: testdb
+      MYSQL_ROOT_PASSWORD: 1257
+      MYSQL_ROOT_HOST: '%'
+      TZ: Asia/Seoul
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    ports:
+      - "13306:3306"
+
+volumes:
+  influxdb_data:
+  db_datas:
