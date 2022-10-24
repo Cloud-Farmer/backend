@@ -6,3 +6,4 @@ spring:
     import:
     - application-influxDB.properties
     - application-mysql.properties
+    - application-mqtt.yaml
