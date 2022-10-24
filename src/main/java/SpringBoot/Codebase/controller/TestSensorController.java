@@ -21,4 +21,10 @@ public class TestSensorController {
     public void writeInflux(){
         sensorService.writeData();
     }
+
+    @PostMapping("/test2")
+    public void test2() {
+        sensorService.sentToMqtt();
+    }
+
 }
