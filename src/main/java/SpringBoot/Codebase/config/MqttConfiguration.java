@@ -2,13 +2,16 @@ package SpringBoot.Codebase.config;
 
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.integration.annotation.IntegrationComponentScan;
 import org.springframework.integration.annotation.MessagingGateway;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.core.MessageProducer;
 import org.springframework.integration.mqtt.core.DefaultMqttPahoClientFactory;
+import org.springframework.integration.mqtt.core.MqttPahoClientFactory;
 import org.springframework.integration.mqtt.inbound.MqttPahoMessageDrivenChannelAdapter;
 import org.springframework.integration.mqtt.outbound.MqttPahoMessageHandler;
 import org.springframework.integration.mqtt.support.DefaultPahoMessageConverter;
@@ -18,29 +21,39 @@ import org.springframework.messaging.MessageHandler;
 import org.springframework.messaging.handler.annotation.Header;
 
 @Configuration
+@IntegrationComponentScan
 public class MqttConfiguration {
 
-    private static final String MQTT_USERNAME = "test";
-    private static final String MQTT_PASSWORD = "1257";
-    private static final String BROKER_URL = "192.168.0.37";
-    private static final String MQTT_CLIENT_ID = MqttAsyncClient.generateClientId();
-    private static final String TOPIC_FILTER = "";
+    private final String BROKER_URL;
+    private final String MQTT_SUB_CLIENT_ID = MqttAsyncClient.generateClientId();
+    private final String MQTT_PUB_CLIENT_ID = MqttAsyncClient.generateClientId();
+    private final String TOPIC_FILTER;
 
+    public MqttConfiguration(@Value("${mqtt.url}") String BROKER_URL,
+                             @Value("${mqtt.port}") String PORT,
+                             @Value("${mqtt.topic}") String TOPIC) {
+        this.BROKER_URL = BROKER_URL + ":" + PORT;
+        this.TOPIC_FILTER = TOPIC;
+    }
 
     private MqttConnectOptions connectOptions() {
         MqttConnectOptions options = new MqttConnectOptions();
         options.setCleanSession(true);
-        options.setUserName(MQTT_USERNAME);
-        options.setPassword(MQTT_PASSWORD.toCharArray());
+//        options.setUserName(MQTT_USERNAME);
+//        options.setPassword(MQTT_PASSWORD.toCharArray());
+        options.setServerURIs(new String[] { BROKER_URL });
         return options;
     }
 
+
     @Bean
-    public DefaultMqttPahoClientFactory defaultMqttPahoClientFactory() {
-        DefaultMqttPahoClientFactory clientFactory = new DefaultMqttPahoClientFactory();
-        clientFactory.setConnectionOptions(connectOptions());
-        return clientFactory;
+    public DefaultMqttPahoClientFactory mqttClientFactory() {
+        DefaultMqttPahoClientFactory factory = new DefaultMqttPahoClientFactory();
+        factory.setConnectionOptions(connectOptions());
+        return factory;
     }
+
+    // 구독 세팅
     @Bean
     public MessageChannel mqttInputChannel() {
         return new DirectChannel();
@@ -49,7 +62,7 @@ public class MqttConfiguration {
     @Bean
     public MessageProducer inboundChannel() {
         MqttPahoMessageDrivenChannelAdapter adapter =
-                new MqttPahoMessageDrivenChannelAdapter(BROKER_URL, MQTT_CLIENT_ID, TOPIC_FILTER);
+                new MqttPahoMessageDrivenChannelAdapter(BROKER_URL, MQTT_SUB_CLIENT_ID, TOPIC_FILTER);
         adapter.setCompletionTimeout(5000);
         adapter.setConverter(new DefaultPahoMessageConverter());
         adapter.setQos(1);
@@ -66,6 +79,8 @@ public class MqttConfiguration {
             System.out.println("Payload" + message.getPayload());
         };
     }
+
+    // 발행
     @Bean
     public MessageChannel mqttOutboundChannel() {
         return new DirectChannel();
@@ -73,16 +88,19 @@ public class MqttConfiguration {
 
     @Bean
     @ServiceActivator(inputChannel = "mqttOutboundChannel")
-    public MessageHandler mqttOutbound(DefaultMqttPahoClientFactory clientFactory) {
-        MqttPahoMessageHandler messageHandler =
-                new MqttPahoMessageHandler(MQTT_CLIENT_ID, clientFactory);
+    public MessageHandler mqttOrderMessageHandler() {
+        MqttPahoMessageHandler messageHandler = new MqttPahoMessageHandler(MQTT_PUB_CLIENT_ID, mqttClientFactory());
         messageHandler.setAsync(true);
-        messageHandler.setDefaultQos(1);
+        messageHandler.setDefaultTopic(TOPIC_FILTER);
         return messageHandler;
     }
 
     @MessagingGateway(defaultRequestChannel = "mqttOutboundChannel")
-    public interface OutboundGateway {
-        void sendToMqtt(String payload, @Header(MqttHeaders.TOPIC) String topic);
+    public interface MqttOrderGateway {
+        void sendToMqtt(String data, @Header(MqttHeaders.TOPIC) String topic);
     }
 }
+
+// {id}/actuator?motor=1&pen=1 // query parmater
+// {id}/actuator
+// 1 : true, 0 : false
