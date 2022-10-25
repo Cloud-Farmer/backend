@@ -1,9 +1,6 @@
 package SpringBoot.Codebase.config;
 
-<<<<<<< HEAD
-=======
 import SpringBoot.Codebase.domain.measurement.Temperature;
->>>>>>> 9fcb0b52fb08da2b9a220ee559158639cd9cccd3
 import SpringBoot.Codebase.domain.service.SensorService;
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -32,7 +29,6 @@ public class MqttConfiguration {
     private final String BROKER_URL;
     private final String MQTT_SUB_CLIENT_ID = MqttAsyncClient.generateClientId();
     private final String MQTT_PUB_CLIENT_ID = MqttAsyncClient.generateClientId();
-<<<<<<< HEAD
     private final String TOPIC_FILTER;
     @Autowired
     private final SensorService sensorService;
@@ -40,10 +36,8 @@ public class MqttConfiguration {
                              @Value("${mqtt.port}") String PORT,
                              @Value("${mqtt.topic}") String TOPIC, SensorService sensorService) {
         this.sensorService = sensorService;
-=======
     private final String TOPIC1;
     private final String TOPIC2;
-
     private final SensorService sensorService;
 
     @Autowired
@@ -53,7 +47,6 @@ public class MqttConfiguration {
                              @Value("${mqtt.topic2}") String TOPIC2, SensorService sensorService) {
         this.sensorService = sensorService;
 
->>>>>>> 9fcb0b52fb08da2b9a220ee559158639cd9cccd3
         this.BROKER_URL = BROKER_URL + ":" + PORT;
         this.TOPIC1 = TOPIC1;
         this.TOPIC2 = TOPIC2;

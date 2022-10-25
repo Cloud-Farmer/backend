@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.influxdb.InfluxDBTemplate;
 import org.springframework.stereotype.Service;
+import retrofit2.http.HEAD;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -36,12 +37,11 @@ public class SensorService {
         mqttOrderGateway.sendToMqtt(available, topic);
         log.info("topic: {} data : {}",topic,available);
     }
-<<<<<<< HEAD
     public void writeData() {
 
         for (int index = 1; index <= 1; index++) {
             Point point = Point.measurement("smartfarm_db")
-=======
+
 
     public void writeTemperature(Temperature temperature) {
         //influxDBTemplate.write(Point.measurementByPOJO(Temperature.class).addFieldsFromPOJO(temperature).build());
@@ -56,7 +56,6 @@ public class SensorService {
     public void writeData() {
         for (int index = 1; index <= 1; index++) {
             Point point = Point.measurement("kit1")
->>>>>>> 9fcb0b52fb08da2b9a220ee559158639cd9cccd3
                     .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
                     .tag("farmname", "test" + 4)
                     .addField("huminity", (float)(0.12+1))
@@ -67,14 +66,12 @@ public class SensorService {
             influxDBTemplate.write(point);
         }
     }
-
-<<<<<<< HEAD
         Query query = BoundParameterQuery.QueryBuilder.newQuery("SELECT * FROM smartfarm_db tz('Asia/Seoul')")
-=======
+
     public List<Temperature> selectDataFromTemperature(String sensor) {
 
         Query query = BoundParameterQuery.QueryBuilder.newQuery(String.format("SELECT * FROM temperature tz('Asia/Seoul') "))
->>>>>>> 9fcb0b52fb08da2b9a220ee559158639cd9cccd3
+
                 .forDatabase("smartfarm")
                 .create();
 
