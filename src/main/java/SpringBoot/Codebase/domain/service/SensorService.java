@@ -40,13 +40,13 @@ public class SensorService{
     }
     @Autowired
     @ServiceActivator(inputChannel = "mqttInputChannel")
-    public MessageHandler inboundMessageHandler(
-            return message -> {
-        String topic = (String) message.getHeaders().get(MqttHeaders.RECEIVED_TOPIC);
-        System.out.println("Topic:" + topic);
-        System.out.println("Payload" + message.getPayload());
-    };
-    )
+//    public MessageHandler inboundMessageHandler(
+//            return message -> {
+//        String topic = (String) message.getHeaders().get(MqttHeaders.RECEIVED_TOPIC);
+//        System.out.println("Topic:" + topic);
+//        System.out.println("Payload" + message.getPayload());
+//    };
+//    )
     public void writeData() {
 //        Pong response = this.influxDB.ping();
 //        if (response.getVersion().equalsIgnoreCase("unknown")) {
@@ -69,20 +69,21 @@ public class SensorService{
             e.printStackTrace();
         }*/
         for (int index = 1; index <= 1; index++) {
-            Point point = Point.measurement("test_db")
+            Point point = Point.measurement("smartfarm_db")
                     .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
                     .tag("farmname", "test" + 4)
                     .addField("huminity", (float)(0.12+1))
-                    .addField("moisture", (float)(0.23+2))
+                    .addField("cdc", (float)(0.23+2))
                     .addField("temperature",(float)(0.46+3))
+                    .addField("soil",(float)(0.46+3))
                     .build();
             influxDBTemplate.write(point);
         }
     }
     public List<Sensordto> SelectSensorData() {
 
-        Query query = BoundParameterQuery.QueryBuilder.newQuery("SELECT * FROM test_db tz('Asia/Seoul')")
-                .forDatabase("test")
+        Query query = BoundParameterQuery.QueryBuilder.newQuery("SELECT * FROM smartfarm_db tz('Asia/Seoul')")
+                .forDatabase("smartfarm")
                 .create();
 
         QueryResult queryResult = influxDBTemplate.query(query);
