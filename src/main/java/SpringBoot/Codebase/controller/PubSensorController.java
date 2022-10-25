@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RequestMapping("/api")
 @RestController
+@CrossOrigin(origins="*", allowedHeaders = "*")
 public class PubSensorController {
     private final SensorService sensorService;
 
@@ -26,5 +27,6 @@ public class PubSensorController {
         // topic kitid/actuator/sensor => data available
         sensorService.sentToMqtt(kitId,sensor,available);
         return new ResponseEntity(temp, HttpStatus.OK);
+
     }
 }

@@ -13,18 +13,18 @@ import java.util.List;
 @CrossOrigin(origins="*", allowedHeaders = "*")
 public class TestSensorController {
 
-    @Autowired
-    private SensorService sensorService;
-    @GetMapping("/test")
-    @ApiOperation("센서 데이터 출력")
-    public @ResponseBody List <Sensordto> sensordtos(){
-        return sensorService.SelectSensorData();
-    }
-    @GetMapping("/test1")
-    @ApiOperation("센서 데이터 입력")
-    public void writeInflux(){
-        sensorService.writeData();
-    }
+//    @Autowired
+//    private SensorService sensorService;
+//    @GetMapping("/test")
+//    @ApiOperation("센서 데이터 출력")
+//    public @ResponseBody List <Sensordto> sensordtos(){
+//        return sensorService.SelectSensorData();
+//    }
+//    @GetMapping("/test1")
+//    @ApiOperation("센서 데이터 입력")
+//    public void writeInflux(){
+//        sensorService.writeData();
+//    }
 
 //    @PostMapping("/test2")
 //    @ApiOperation("PUB 발행")

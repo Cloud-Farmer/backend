@@ -1,10 +1,7 @@
 package SpringBoot.Codebase.config;
 
-import SpringBoot.Codebase.domain.measurement.Temperature;
-import SpringBoot.Codebase.domain.service.SensorService;
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,26 +27,12 @@ public class MqttConfiguration {
     private final String MQTT_SUB_CLIENT_ID = MqttAsyncClient.generateClientId();
     private final String MQTT_PUB_CLIENT_ID = MqttAsyncClient.generateClientId();
     private final String TOPIC_FILTER;
-    @Autowired
-    private final SensorService sensorService;
+
     public MqttConfiguration(@Value("${mqtt.url}") String BROKER_URL,
                              @Value("${mqtt.port}") String PORT,
-                             @Value("${mqtt.topic}") String TOPIC, SensorService sensorService) {
-        this.sensorService = sensorService;
-    private final String TOPIC1;
-    private final String TOPIC2;
-    private final SensorService sensorService;
-
-    @Autowired
-    public MqttConfiguration(@Value("${mqtt.url}") String BROKER_URL,
-                             @Value("${mqtt.port}") String PORT,
-                             @Value("${mqtt.topic1}") String TOPIC1,
-                             @Value("${mqtt.topic2}") String TOPIC2, SensorService sensorService) {
-        this.sensorService = sensorService;
-
+                             @Value("${mqtt.topic}") String TOPIC) {
         this.BROKER_URL = BROKER_URL + ":" + PORT;
-        this.TOPIC1 = TOPIC1;
-        this.TOPIC2 = TOPIC2;
+        this.TOPIC_FILTER = TOPIC;
     }
 
     private MqttConnectOptions connectOptions() {
@@ -78,7 +61,7 @@ public class MqttConfiguration {
     @Bean
     public MessageProducer inboundChannel() {
         MqttPahoMessageDrivenChannelAdapter adapter =
-                new MqttPahoMessageDrivenChannelAdapter(BROKER_URL, MQTT_SUB_CLIENT_ID, TOPIC1, TOPIC2);
+                new MqttPahoMessageDrivenChannelAdapter(BROKER_URL, MQTT_SUB_CLIENT_ID, TOPIC_FILTER);
         adapter.setCompletionTimeout(5000);
         adapter.setConverter(new DefaultPahoMessageConverter());
         adapter.setQos(1);
@@ -91,6 +74,8 @@ public class MqttConfiguration {
     public MessageHandler inboundMessageHandler() {
         return message -> {
             String topic = (String) message.getHeaders().get(MqttHeaders.RECEIVED_TOPIC);
+            System.out.println("Topic:" + topic);
+            System.out.println("Payload" + message.getPayload());
         };
     }
 
@@ -105,6 +90,7 @@ public class MqttConfiguration {
     public MessageHandler mqttOrderMessageHandler() {
         MqttPahoMessageHandler messageHandler = new MqttPahoMessageHandler(MQTT_PUB_CLIENT_ID, mqttClientFactory());
         messageHandler.setAsync(true);
+        messageHandler.setDefaultTopic(TOPIC_FILTER);
         return messageHandler;
     }
 
@@ -113,7 +99,3 @@ public class MqttConfiguration {
         void sendToMqtt(String data, @Header(MqttHeaders.TOPIC) String topic);
     }
 }
-
-// {id}/actuator?motor=1&pen=1 // query parmater
-// {id}/actuator
-// 1 : true, 0 : false
