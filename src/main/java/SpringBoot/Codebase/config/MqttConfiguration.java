@@ -91,22 +91,6 @@ public class MqttConfiguration {
     public MessageHandler inboundMessageHandler() {
         return message -> {
             String topic = (String) message.getHeaders().get(MqttHeaders.RECEIVED_TOPIC);
-//            System.out.println("Topic:" + topic);
-//            System.out.println("Payload " + message.getPayload());
-
-            // 수신 받은 데이터 InfluxDB에 적재
-            String[] token = topic.split("/");
-            String kitId = token[0];
-            if (token.length > 2) { // 1 이상이면 1/sensor/sensor 임
-                String sensor = token[2];
-                String value = message.getPayload().toString();
-                if (sensor.equals("temperature")) {
-                    Temperature temperature = new Temperature();
-                    temperature.setValue(value);
-                    temperature.setKitId(kitId);
-                    sensorService.writeTemperature(temperature);
-                }
-            }
         };
     }
 
