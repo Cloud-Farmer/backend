@@ -39,4 +39,19 @@ public class SubSensorController {
     public ResponseEntity requestSensors(@RequestParam("kit_id") String kitId) {
         return new ResponseEntity("", HttpStatus.OK);
     }
+//    private SensorService sensorService;
+//
+//    @Autowired
+//    public SubSensorController(SensorService sensorService) {
+//        this.sensorService = sensorService;
+//    }
+//
+//    @GetMapping("/sensor")
+//    public ResponseEntity requestSensorData(@RequestParam("kitid") String kitId,
+//                                            @RequestParam("sensor") String sensor) { // TODO : 시간 Range도 받아야함
+//
+//        List<Temperature> temperatures = sensorService.selectDataFromTemperature(sensor);
+//
+//        return new ResponseEntity(temperatures, HttpStatus.OK);
+//    }
 }

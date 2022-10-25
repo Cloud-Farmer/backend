@@ -8,7 +8,7 @@ import SpringBoot.Codebase.domain.measurement.Humidity;
 import SpringBoot.Codebase.domain.measurement.Soil;
 import SpringBoot.Codebase.domain.measurement.Temperature;
 import lombok.extern.slf4j.Slf4j;
-import org.influxdb.dto.BoundParameterQuery;
+
 import org.influxdb.dto.Point;
 import org.influxdb.dto.Query;
 import org.influxdb.dto.QueryResult;
@@ -16,11 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.influxdb.InfluxDBTemplate;
+
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
 
 @Service@Slf4j
 public class SensorService {
@@ -37,10 +34,12 @@ public class SensorService {
 
     //private final InfluxDB influxDB = InfluxDBFactory.connect("http://localhost:8086","admin","12345");
 
-    public void sentToMqtt() {
-        mqttOrderGateway.sendToMqtt("1", "1/actuator/motor");
+    public void sentToMqtt(String kitId, String sensor, String available) {
+        String topic = kitId + "/actuator/" + sensor;
+        mqttOrderGateway.sendToMqtt(available, topic);
+        log.info("topic {} data : {}", topic, available);
     }
-
+  
     public void writeTemperature(Temperature temperature) {
         Point point = Point.measurement("temperature")
                 .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
@@ -101,5 +100,5 @@ public class SensorService {
 
         return queryResult.getResults();
     }
-
+  
 }
