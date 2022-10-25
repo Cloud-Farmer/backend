@@ -1,7 +1,6 @@
 package SpringBoot.Codebase.controller;
 
 import SpringBoot.Codebase.domain.service.SensorService;
-import okhttp3.Response;
 import org.influxdb.dto.QueryResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,6 +37,6 @@ public class SubSensorController {
 
     @GetMapping("/sensors") // TODO : SmartFarm Entity 구현하고 하기
     public ResponseEntity requestSensors(@RequestParam("kit_id") String kitId) {
-
+        return new ResponseEntity("", HttpStatus.OK);
     }
 }
