@@ -51,7 +51,7 @@ public class SensorService {
     }
 
     public void writeHumidity(Humidity humidity) {
-        Point point = Point.measurement("temperature")
+        Point point = Point.measurement("humidity")
                 .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
                 .addField("kit_id", humidity.getKitId())
                 .addField("value", humidity.getValue())
@@ -60,7 +60,7 @@ public class SensorService {
     }
 
     public void writeCdc(Cdc cdc) {
-        Point point = Point.measurement("temperature")
+        Point point = Point.measurement("cdc")
                 .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
                 .addField("kit_id", cdc.getKitId())
                 .addField("value", cdc.getValue())
@@ -69,7 +69,7 @@ public class SensorService {
     }
 
     public void writeSoil(Soil soil) {
-        Point point = Point.measurement("temperature")
+        Point point = Point.measurement("soil")
                 .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
                 .addField("kit_id", soil.getKitId())
                 .addField("value", soil.getValue())
