@@ -23,6 +23,7 @@ dependencies {
 
 	implementation group: 'org.influxdb', name: 'influxdb-java', version: '2.22'
 	implementation 'com.github.miwurster:spring-data-influxdb:1.8'
+	implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.4.2'
 
 	compileOnly group: 'mysql', name: 'mysql-connector-java', version: '8.0.22'
 

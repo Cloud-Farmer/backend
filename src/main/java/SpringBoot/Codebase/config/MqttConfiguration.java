@@ -1,7 +1,10 @@
 package SpringBoot.Codebase.config;
 
+import SpringBoot.Codebase.domain.measurement.Temperature;
+import SpringBoot.Codebase.domain.service.SensorService;
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,10 +32,14 @@ public class MqttConfiguration {
     private final String TOPIC1;
     private final String TOPIC2;
 
+    private final SensorService sensorService;
+
+    @Autowired
     public MqttConfiguration(@Value("${mqtt.url}") String BROKER_URL,
                              @Value("${mqtt.port}") String PORT,
                              @Value("${mqtt.topic1}") String TOPIC1,
-                             @Value("${mqtt.topic2}") String TOPIC2) {
+                             @Value("${mqtt.topic2}") String TOPIC2, SensorService sensorService) {
+        this.sensorService = sensorService;
 
         this.BROKER_URL = BROKER_URL + ":" + PORT;
         this.TOPIC1 = TOPIC1;
@@ -78,11 +85,22 @@ public class MqttConfiguration {
     public MessageHandler inboundMessageHandler() {
         return message -> {
             String topic = (String) message.getHeaders().get(MqttHeaders.RECEIVED_TOPIC);
-            System.out.println("Topic:" + topic);
-            System.out.println("Payload " + message.getPayload());
+//            System.out.println("Topic:" + topic);
+//            System.out.println("Payload " + message.getPayload());
 
             // 수신 받은 데이터 InfluxDB에 적재
-
+            String[] token = topic.split("/");
+            String kitId = token[0];
+            if (token.length > 2) { // 1 이상이면 1/sensor/sensor 임
+                String sensor = token[2];
+                String value = message.getPayload().toString();
+                if (sensor.equals("temperature")) {
+                    Temperature temperature = new Temperature();
+                    temperature.setValue(value);
+                    temperature.setKitId(kitId);
+                    sensorService.writeTemperature(temperature);
+                }
+            }
         };
     }
 

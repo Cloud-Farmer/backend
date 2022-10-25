@@ -1,15 +1,15 @@
-package SpringBoot.Codebase.domain.dto;
+package SpringBoot.Codebase.domain.measurement;
 
 import lombok.Data;
-import org.influxdb.annotation.Column;
 import org.influxdb.annotation.Measurement;
 import org.influxdb.annotation.TimeColumn;
 
+import javax.persistence.Column;
 import java.time.Instant;
 
 @Data
-@Measurement(name = "sensor")
-public class Sensordto {
+@Measurement(name = "temperature")
+public class Temperature {
 
     @TimeColumn
     @Column(name = "time")

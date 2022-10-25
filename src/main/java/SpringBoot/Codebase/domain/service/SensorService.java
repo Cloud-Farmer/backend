@@ -3,6 +3,7 @@ package SpringBoot.Codebase.domain.service;
 
 import SpringBoot.Codebase.config.MqttConfiguration;
 import SpringBoot.Codebase.domain.dto.Sensordto;
+import SpringBoot.Codebase.domain.measurement.Temperature;
 import lombok.extern.slf4j.Slf4j;
 import org.influxdb.dto.BoundParameterQuery;
 import org.influxdb.dto.Point;
@@ -20,12 +21,12 @@ import java.util.concurrent.TimeUnit;
 
 
 @Service@Slf4j
-public class SensorService{
+public class SensorService {
 
+    private final static Logger logger = LoggerFactory.getLogger(Sensordto.class.getSimpleName());
     @Autowired
     private MqttConfiguration.MqttOrderGateway mqttOrderGateway;
 
-    private final static Logger logger = LoggerFactory.getLogger(Sensordto.class.getSimpleName());
     private final InfluxDBTemplate<Point> influxDBTemplate;
 
     public SensorService(InfluxDBTemplate<Point> influxDBTemplate) {
@@ -38,27 +39,17 @@ public class SensorService{
         mqttOrderGateway.sendToMqtt("1", "1/actuator/motor");
     }
 
+    public void writeTemperature(Temperature temperature) {
+        //influxDBTemplate.write(Point.measurementByPOJO(Temperature.class).addFieldsFromPOJO(temperature).build());
+        Point point = Point.measurement("temperature")
+                .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
+                .tag("kitid", temperature.getKitId())
+                .addField("value", temperature.getValue())
+                .build();
+        influxDBTemplate.write(point);
+    }
+
     public void writeData() {
-//        Pong response = this.influxDB.ping();
-//        if (response.getVersion().equalsIgnoreCase("unknown")) {
-//            //log.error("Error pinging server.")
-//            return;
-//        }
-//        influxDB.createDatabase("dbtest");
-//        influxDB.createRetentionPolicy(
-//                "defaultPolicy", "baeldung", "30d", 1, true);
-
-//        influxDB.setLogLevel(InfluxDB.LogLevel.BASIC);
-        /*try {
-            MqttClient mqttClient = new MqttClient("tcp://192.168.0.37:1883","client1");
-            mqttClient.connect();
-            mqttClient.subscribe("cloudfarm/humidity");
-            String hum = String.valueOf(mqttClient.getTopic("humidity"));
-
-            log.info(hum);
-        } catch (MqttException e) {
-            e.printStackTrace();
-        }*/
         for (int index = 1; index <= 1; index++) {
             Point point = Point.measurement("kit1")
                     .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
@@ -70,21 +61,22 @@ public class SensorService{
             influxDBTemplate.write(point);
         }
     }
-    public List<Sensordto> SelectSensorData() {
 
-        Query query = BoundParameterQuery.QueryBuilder.newQuery("SELECT * FROM test_db tz('Asia/Seoul')")
-                .forDatabase("test")
+    public List<Temperature> selectDataFromTemperature(String sensor) {
+
+        Query query = BoundParameterQuery.QueryBuilder.newQuery(String.format("SELECT * FROM temperature tz('Asia/Seoul') "))
+                .forDatabase("smartfarm")
                 .create();
 
         QueryResult queryResult = influxDBTemplate.query(query);
 
         InfluxDBResultMapper resultMapper = new InfluxDBResultMapper(); // thread-safe - can be reused
-        List<Sensordto> testMeasurementList = resultMapper.toPOJO(queryResult, Sensordto.class);
+        List<Temperature> temperatures = resultMapper.toPOJO(queryResult, Temperature.class);
 
-        for (Sensordto tm : testMeasurementList) {
-            System.err.println("tm. = " + tm.toString());
+        for (Temperature data : temperatures) {
+            log.info(data.toString());
         }
-        return testMeasurementList;
+        return temperatures;
     }
 
 }
