@@ -1,9 +1,11 @@
 package SpringBoot.Codebase.domain.dto;
 
+import lombok.Data;
 import org.influxdb.annotation.Column;
 import org.influxdb.annotation.Measurement;
 import org.influxdb.annotation.TimeColumn;
-import org.springframework.beans.factory.annotation.Value;
+
+import java.time.Instant;
 
 @Measurement(name = "smartfarm_db")
 public class Sensordto {
@@ -19,5 +21,4 @@ public class Sensordto {
     private Double soil;
     @Column(name = "farmname")
     private String farmName;
-
 }
