@@ -1,7 +1,7 @@
 package SpringBoot.Codebase.controller;
 
-import SpringBoot.Codebase.domain.measurement.Temperature;
 import SpringBoot.Codebase.domain.service.SensorService;
+import org.influxdb.dto.QueryResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,11 +24,12 @@ public class SubSensorController {
     }
 
     @GetMapping("/sensor")
-    public ResponseEntity requestSensorData(@RequestParam("kitid") String kitId,
-                                            @RequestParam("sensor") String sensor) { // TODO : 시간 Range도 받아야함
+    public ResponseEntity requestSensorData(@RequestParam("kit_id") String kitId,
+                                            @RequestParam("sensor") String sensor,
+                                            @RequestParam("limit") String limit) {
 
-        List<Temperature> temperatures = sensorService.selectDataFromTemperature(sensor);
+        List<QueryResult.Result> results = sensorService.selectDataFromTemperature(sensor, limit);
 
-        return new ResponseEntity(temperatures, HttpStatus.OK);
+        return new ResponseEntity(results, HttpStatus.OK);
     }
 }

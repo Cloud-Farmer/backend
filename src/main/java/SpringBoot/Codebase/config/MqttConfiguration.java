@@ -2,6 +2,7 @@ package SpringBoot.Codebase.config;
 
 import SpringBoot.Codebase.domain.measurement.Temperature;
 import SpringBoot.Codebase.domain.service.SensorService;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHandler;
 import org.springframework.messaging.handler.annotation.Header;
 
+@Slf4j
 @Configuration
 @IntegrationComponentScan
 public class MqttConfiguration {
@@ -87,6 +89,7 @@ public class MqttConfiguration {
             String topic = (String) message.getHeaders().get(MqttHeaders.RECEIVED_TOPIC);
 //            System.out.println("Topic:" + topic);
 //            System.out.println("Payload " + message.getPayload());
+            log.info("topic: " + topic + " payload: " + message.getPayload());
 
             // 수신 받은 데이터 InfluxDB에 적재
             String[] token = topic.split("/");

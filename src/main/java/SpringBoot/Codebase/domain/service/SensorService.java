@@ -9,7 +9,6 @@ import org.influxdb.dto.BoundParameterQuery;
 import org.influxdb.dto.Point;
 import org.influxdb.dto.Query;
 import org.influxdb.dto.QueryResult;
-import org.influxdb.impl.InfluxDBResultMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +42,7 @@ public class SensorService {
         //influxDBTemplate.write(Point.measurementByPOJO(Temperature.class).addFieldsFromPOJO(temperature).build());
         Point point = Point.measurement("temperature")
                 .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
-                .tag("kitid", temperature.getKitId())
+                .addField("kit_id", temperature.getKitId())
                 .addField("value", temperature.getValue())
                 .build();
         influxDBTemplate.write(point);
@@ -62,21 +61,16 @@ public class SensorService {
         }
     }
 
-    public List<Temperature> selectDataFromTemperature(String sensor) {
+    public List<QueryResult.Result> selectDataFromTemperature(String sensor, String limit) {
+        String queryStr = String.format("SELECT * FROM %s LIMIT %s", sensor, limit);
 
-        Query query = BoundParameterQuery.QueryBuilder.newQuery(String.format("SELECT * FROM temperature tz('Asia/Seoul') "))
+        Query query = BoundParameterQuery.QueryBuilder.newQuery(queryStr)
                 .forDatabase("smartfarm")
                 .create();
 
         QueryResult queryResult = influxDBTemplate.query(query);
 
-        InfluxDBResultMapper resultMapper = new InfluxDBResultMapper(); // thread-safe - can be reused
-        List<Temperature> temperatures = resultMapper.toPOJO(queryResult, Temperature.class);
-
-        for (Temperature data : temperatures) {
-            log.info(data.toString());
-        }
-        return temperatures;
+        return queryResult.getResults();
     }
 
 }

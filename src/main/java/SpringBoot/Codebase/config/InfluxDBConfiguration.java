@@ -1,9 +1,7 @@
 package SpringBoot.Codebase.config;
 
 
-
 import org.influxdb.dto.Point;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,7 +30,6 @@ public class InfluxDBConfiguration {
          */
         return new InfluxDBTemplate<>(connectionFactory, new PointConverter());
     }
-
     @Bean
     public DefaultInfluxDBTemplate defaultTemplate(
             final InfluxDBConnectionFactory connectionFactory) {
