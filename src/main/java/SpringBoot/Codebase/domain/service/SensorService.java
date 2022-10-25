@@ -13,13 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.influxdb.InfluxDBTemplate;
-import org.springframework.integration.annotation.ServiceActivator;
-import org.springframework.integration.mqtt.support.MqttHeaders;
-import org.springframework.messaging.MessageHandler;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import org.springframework.messaging.Message;
 @Service@Slf4j
 public class SensorService{
 
@@ -33,41 +29,13 @@ public class SensorService{
         this.influxDBTemplate = influxDBTemplate;
     }
 
-    //private final InfluxDB influxDB = InfluxDBFactory.connect("http://localhost:8086","admin","12345");
-
-    public void sentToMqtt() {
-        mqttOrderGateway.sendToMqtt("1", "1/actuator/motor");
+    public void sentToMqtt(String kitId, String sensor, String available) {
+        String topic = kitId+ "/actuator/" + sensor;
+        mqttOrderGateway.sendToMqtt(available, topic);
+        log.info("topic: {} data : {}",topic,available);
     }
-    @Autowired
-    @ServiceActivator(inputChannel = "mqttInputChannel")
-//    public MessageHandler inboundMessageHandler(
-//            return message -> {
-//        String topic = (String) message.getHeaders().get(MqttHeaders.RECEIVED_TOPIC);
-//        System.out.println("Topic:" + topic);
-//        System.out.println("Payload" + message.getPayload());
-//    };
-//    )
     public void writeData() {
-//        Pong response = this.influxDB.ping();
-//        if (response.getVersion().equalsIgnoreCase("unknown")) {
-//            //log.error("Error pinging server.")
-//            return;
-//        }
-//        influxDB.createDatabase("dbtest");
-//        influxDB.createRetentionPolicy(
-//                "defaultPolicy", "baeldung", "30d", 1, true);
 
-//        influxDB.setLogLevel(InfluxDB.LogLevel.BASIC);
-        /*try {
-            MqttClient mqttClient = new MqttClient("tcp://192.168.0.37:1883","client1");
-            mqttClient.connect();
-            mqttClient.subscribe("cloudfarm/humidity");
-            String hum = String.valueOf(mqttClient.getTopic("humidity"));
-
-            log.info(hum);
-        } catch (MqttException e) {
-            e.printStackTrace();
-        }*/
         for (int index = 1; index <= 1; index++) {
             Point point = Point.measurement("smartfarm_db")
                     .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
