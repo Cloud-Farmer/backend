@@ -9,12 +9,12 @@ import org.springframework.beans.factory.annotation.Value;
 public class Sensordto {
 
     @TimeColumn
-    @Column(name ="huminity")
-    private Double huminity;
+    @Column(name ="humidity")
+    private Double humidity;
     @Column(name = "temperature")
     private Double temperature;
-    @Column(name = "moisture")
-    private Double moisture;
+    @Column(name = "cdc")
+    private Double cdc;
     @Column(name = "farmname")
     private String farmName;
 

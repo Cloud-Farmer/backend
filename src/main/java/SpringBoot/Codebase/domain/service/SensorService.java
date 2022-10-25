@@ -4,7 +4,6 @@ package SpringBoot.Codebase.domain.service;
 import SpringBoot.Codebase.config.MqttConfiguration;
 import SpringBoot.Codebase.domain.dto.Sensordto;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.paho.client.mqttv3.*;
 import org.influxdb.dto.BoundParameterQuery;
 import org.influxdb.dto.Point;
 import org.influxdb.dto.Query;
@@ -13,17 +12,14 @@ import org.influxdb.impl.InfluxDBResultMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.data.influxdb.InfluxDBTemplate;
 import org.springframework.integration.annotation.ServiceActivator;
-import org.springframework.integration.mqtt.outbound.MqttPahoMessageHandler;
 import org.springframework.integration.mqtt.support.MqttHeaders;
 import org.springframework.messaging.MessageHandler;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-
+import org.springframework.messaging.Message;
 @Service@Slf4j
 public class SensorService{
 
@@ -42,7 +38,15 @@ public class SensorService{
     public void sentToMqtt() {
         mqttOrderGateway.sendToMqtt("1", "1/actuator/motor");
     }
-
+    @Autowired
+    @ServiceActivator(inputChannel = "mqttInputChannel")
+    public MessageHandler inboundMessageHandler(
+            return message -> {
+        String topic = (String) message.getHeaders().get(MqttHeaders.RECEIVED_TOPIC);
+        System.out.println("Topic:" + topic);
+        System.out.println("Payload" + message.getPayload());
+    };
+    )
     public void writeData() {
 //        Pong response = this.influxDB.ping();
 //        if (response.getVersion().equalsIgnoreCase("unknown")) {
