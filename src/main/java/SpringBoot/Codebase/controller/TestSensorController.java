@@ -26,10 +26,10 @@ public class TestSensorController {
         sensorService.writeData();
     }
 
-    @PostMapping("/test2")
-    @ApiOperation("PUB 발행")
-    public void test2() {
-        sensorService.sentToMqtt();
-    }
+//    @PostMapping("/test2")
+//    @ApiOperation("PUB 발행")
+//    public void test2() {
+//        sensorService.sentToMqtt();
+//    }
 
 }

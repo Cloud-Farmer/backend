@@ -14,5 +14,4 @@ public class WebConfiguration implements WebMvcConfigurer {
                 .allowedMethods("*")
                 .maxAge(3000);
     }
-
 }
