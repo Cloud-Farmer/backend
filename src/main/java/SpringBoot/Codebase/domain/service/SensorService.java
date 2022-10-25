@@ -3,6 +3,9 @@ package SpringBoot.Codebase.domain.service;
 
 import SpringBoot.Codebase.config.MqttConfiguration;
 import SpringBoot.Codebase.domain.dto.Sensordto;
+import SpringBoot.Codebase.domain.measurement.Cdc;
+import SpringBoot.Codebase.domain.measurement.Humidity;
+import SpringBoot.Codebase.domain.measurement.Soil;
 import SpringBoot.Codebase.domain.measurement.Temperature;
 import lombok.extern.slf4j.Slf4j;
 import org.influxdb.dto.BoundParameterQuery;
@@ -39,11 +42,37 @@ public class SensorService {
     }
 
     public void writeTemperature(Temperature temperature) {
-        //influxDBTemplate.write(Point.measurementByPOJO(Temperature.class).addFieldsFromPOJO(temperature).build());
         Point point = Point.measurement("temperature")
                 .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
                 .addField("kit_id", temperature.getKitId())
                 .addField("value", temperature.getValue())
+                .build();
+        influxDBTemplate.write(point);
+    }
+
+    public void writeHumidity(Humidity humidity) {
+        Point point = Point.measurement("temperature")
+                .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
+                .addField("kit_id", humidity.getKitId())
+                .addField("value", humidity.getValue())
+                .build();
+        influxDBTemplate.write(point);
+    }
+
+    public void writeCdc(Cdc cdc) {
+        Point point = Point.measurement("temperature")
+                .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
+                .addField("kit_id", cdc.getKitId())
+                .addField("value", cdc.getValue())
+                .build();
+        influxDBTemplate.write(point);
+    }
+
+    public void writeSoil(Soil soil) {
+        Point point = Point.measurement("temperature")
+                .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
+                .addField("kit_id", soil.getKitId())
+                .addField("value", soil.getValue())
                 .build();
         influxDBTemplate.write(point);
     }
@@ -61,7 +90,7 @@ public class SensorService {
         }
     }
 
-    public List<QueryResult.Result> selectDataFromTemperature(String sensor, String limit) {
+    public List<QueryResult.Result> selectDataFromSensor(String sensor, String limit) {
         String queryStr = String.format("SELECT * FROM %s LIMIT %s", sensor, limit);
 
         Query query = BoundParameterQuery.QueryBuilder.newQuery(queryStr)
