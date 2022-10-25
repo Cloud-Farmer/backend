@@ -4,7 +4,6 @@ package SpringBoot.Codebase.domain.service;
 import SpringBoot.Codebase.config.MqttConfiguration;
 import SpringBoot.Codebase.domain.dto.Sensordto;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.paho.client.mqttv3.*;
 import org.influxdb.dto.BoundParameterQuery;
 import org.influxdb.dto.Point;
 import org.influxdb.dto.Query;
@@ -13,13 +12,9 @@ import org.influxdb.impl.InfluxDBResultMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.data.influxdb.InfluxDBTemplate;
-import org.springframework.integration.annotation.ServiceActivator;
-import org.springframework.integration.mqtt.outbound.MqttPahoMessageHandler;
-import org.springframework.integration.mqtt.support.MqttHeaders;
-import org.springframework.messaging.MessageHandler;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -65,7 +60,7 @@ public class SensorService{
             e.printStackTrace();
         }*/
         for (int index = 1; index <= 1; index++) {
-            Point point = Point.measurement("test_db")
+            Point point = Point.measurement("kit1")
                     .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
                     .tag("farmname", "test" + 4)
                     .addField("huminity", (float)(0.12+1))

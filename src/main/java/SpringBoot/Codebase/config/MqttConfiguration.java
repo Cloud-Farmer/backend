@@ -11,7 +11,6 @@ import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.core.MessageProducer;
 import org.springframework.integration.mqtt.core.DefaultMqttPahoClientFactory;
-import org.springframework.integration.mqtt.core.MqttPahoClientFactory;
 import org.springframework.integration.mqtt.inbound.MqttPahoMessageDrivenChannelAdapter;
 import org.springframework.integration.mqtt.outbound.MqttPahoMessageHandler;
 import org.springframework.integration.mqtt.support.DefaultPahoMessageConverter;
@@ -27,13 +26,17 @@ public class MqttConfiguration {
     private final String BROKER_URL;
     private final String MQTT_SUB_CLIENT_ID = MqttAsyncClient.generateClientId();
     private final String MQTT_PUB_CLIENT_ID = MqttAsyncClient.generateClientId();
-    private final String TOPIC_FILTER;
+    private final String TOPIC1;
+    private final String TOPIC2;
 
     public MqttConfiguration(@Value("${mqtt.url}") String BROKER_URL,
                              @Value("${mqtt.port}") String PORT,
-                             @Value("${mqtt.topic}") String TOPIC) {
+                             @Value("${mqtt.topic1}") String TOPIC1,
+                             @Value("${mqtt.topic2}") String TOPIC2) {
+
         this.BROKER_URL = BROKER_URL + ":" + PORT;
-        this.TOPIC_FILTER = TOPIC;
+        this.TOPIC1 = TOPIC1;
+        this.TOPIC2 = TOPIC2;
     }
 
     private MqttConnectOptions connectOptions() {
@@ -62,7 +65,7 @@ public class MqttConfiguration {
     @Bean
     public MessageProducer inboundChannel() {
         MqttPahoMessageDrivenChannelAdapter adapter =
-                new MqttPahoMessageDrivenChannelAdapter(BROKER_URL, MQTT_SUB_CLIENT_ID, TOPIC_FILTER);
+                new MqttPahoMessageDrivenChannelAdapter(BROKER_URL, MQTT_SUB_CLIENT_ID, TOPIC1, TOPIC2);
         adapter.setCompletionTimeout(5000);
         adapter.setConverter(new DefaultPahoMessageConverter());
         adapter.setQos(1);
@@ -76,7 +79,10 @@ public class MqttConfiguration {
         return message -> {
             String topic = (String) message.getHeaders().get(MqttHeaders.RECEIVED_TOPIC);
             System.out.println("Topic:" + topic);
-            System.out.println("Payload" + message.getPayload());
+            System.out.println("Payload " + message.getPayload());
+
+            // 수신 받은 데이터 InfluxDB에 적재
+
         };
     }
 
@@ -91,7 +97,6 @@ public class MqttConfiguration {
     public MessageHandler mqttOrderMessageHandler() {
         MqttPahoMessageHandler messageHandler = new MqttPahoMessageHandler(MQTT_PUB_CLIENT_ID, mqttClientFactory());
         messageHandler.setAsync(true);
-        messageHandler.setDefaultTopic(TOPIC_FILTER);
         return messageHandler;
     }
 
