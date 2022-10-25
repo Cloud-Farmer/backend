@@ -1,5 +1,5 @@
 plugins {
-	id 'org.springframework.boot' version '2.7.4'
+	id 'org.springframework.boot' version '2.6.13'
 	id 'io.spring.dependency-management' version '1.0.14.RELEASE'
 	id 'java'
 }
@@ -21,7 +21,7 @@ dependencies {
 	implementation "org.springframework.integration:spring-integration-stream"
 	implementation 'io.springfox:springfox-boot-starter:3.0.0' // Swagger3
 
-	implementation group: 'org.influxdb', name: 'influxdb-java', version: '2.22'
+	implementation group: 'org.influxdb', name: 'influxdb-java', version: '2.23'
 	implementation 'com.github.miwurster:spring-data-influxdb:1.8'
 	implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.4.2'
 

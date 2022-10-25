@@ -1,5 +1,11 @@
 package SpringBoot.Codebase.config;
 
+import SpringBoot.Codebase.domain.measurement.Cdc;
+import SpringBoot.Codebase.domain.measurement.Humidity;
+import SpringBoot.Codebase.domain.measurement.Soil;
+import SpringBoot.Codebase.domain.measurement.Temperature;
+import SpringBoot.Codebase.domain.service.SensorService;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,6 +25,7 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHandler;
 import org.springframework.messaging.handler.annotation.Header;
 
+@Slf4j
 @Configuration
 @IntegrationComponentScan
 public class MqttConfiguration {
@@ -74,8 +81,38 @@ public class MqttConfiguration {
     public MessageHandler inboundMessageHandler() {
         return message -> {
             String topic = (String) message.getHeaders().get(MqttHeaders.RECEIVED_TOPIC);
-            System.out.println("Topic:" + topic);
-            System.out.println("Payload" + message.getPayload());
+//            System.out.println("Topic:" + topic);
+//            System.out.println("Payload " + message.getPayload());
+            log.info("topic: " + topic + " payload: " + message.getPayload());
+
+            // 수신 받은 데이터 InfluxDB에 적재
+            String[] token = topic.split("/");
+            String kitId = token[0];
+            if (token.length > 2) { // 1 이상이면 1/sensor/sensor 임
+                String sensor = token[2];
+                String value = message.getPayload().toString();
+                if (sensor.equals("temperature")) {
+                    Temperature temperature = new Temperature();
+                    temperature.setValue(value);
+                    temperature.setKitId(kitId);
+                    sensorService.writeTemperature(temperature);
+                } else if (sensor.equals("humidity")) {
+                    Humidity humidity = new Humidity();
+                    humidity.setKitId(kitId);
+                    humidity.setValue(value);
+                    sensorService.writeHumidity(humidity);
+                } else if (sensor.equals("cdc")) {
+                    Cdc cdc = new Cdc();
+                    cdc.setKitId(kitId);
+                    cdc.setValue(value);
+                    sensorService.writeCdc(cdc);
+                } else if (sensor.equals("soil")) {
+                    Soil soil = new Soil();
+                    soil.setKitId(kitId);
+                    soil.setValue(value);
+                    sensorService.writeSoil(soil);
+                }
+            }
         };
     }
 
