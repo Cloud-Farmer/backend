@@ -8,6 +8,7 @@ import SpringBoot.Codebase.domain.service.SensorService;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,11 +36,16 @@ public class MqttConfiguration {
     private final String MQTT_PUB_CLIENT_ID = MqttAsyncClient.generateClientId();
     private final String TOPIC_FILTER;
 
+    private final SensorService sensorService;
+
+    @Autowired
     public MqttConfiguration(@Value("${mqtt.url}") String BROKER_URL,
                              @Value("${mqtt.port}") String PORT,
-                             @Value("${mqtt.topic}") String TOPIC) {
+                             @Value("${mqtt.topic}") String TOPIC,
+                             SensorService sensorService) {
         this.BROKER_URL = BROKER_URL + ":" + PORT;
         this.TOPIC_FILTER = TOPIC;
+        this.sensorService = sensorService;
     }
 
     private MqttConnectOptions connectOptions() {
