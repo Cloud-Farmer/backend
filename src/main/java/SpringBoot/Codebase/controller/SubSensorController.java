@@ -35,7 +35,16 @@ public class SubSensorController {
 
         return new ResponseEntity(results, HttpStatus.OK);
     }
+    @GetMapping("/sensor/1m")
+    public ResponseEntity requestSensorData(@RequestParam("kit_id") String kitId,
+                                            @RequestParam("sensor") String sensor
+                                            ) {
+        List<QueryResult.Result> results = new ArrayList<>();
 
+        results = sensorService.selectDataSensor(sensor);
+
+        return new ResponseEntity(results, HttpStatus.OK);
+    }
     @GetMapping("/actuator")
     public ResponseEntity requestActuatorData(@RequestParam("kit_id") String kitId,
                                               @RequestParam("sensor") String sensor) {
