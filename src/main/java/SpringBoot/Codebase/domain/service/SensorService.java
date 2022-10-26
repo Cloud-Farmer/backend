@@ -35,13 +35,12 @@ public class SensorService {
     }
 
     //private final InfluxDB influxDB = InfluxDBFactory.connect("http://localhost:8086","admin","12345");
-
     public void sentToMqtt(String kitId, String sensor, String available) {
         String topic = kitId + "/actuator/" + sensor;
         mqttOrderGateway.sendToMqtt(available, topic);
         log.info("topic {} data : {}", topic, available);
     }
-  
+
     public void writeTemperature(Temperature temperature) {
         Point point = Point.measurement("temperature")
                 .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
@@ -61,7 +60,7 @@ public class SensorService {
     }
 
     public void writeCdc(Cdc cdc) {
-        Point point = Point.measurement("cdc")
+        Point point = Point.measurement("illuminance")
                 .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
                 .addField("kit_id", cdc.getKitId())
                 .addField("value", cdc.getValue())
@@ -70,7 +69,7 @@ public class SensorService {
     }
 
     public void writeSoil(Soil soil) {
-        Point point = Point.measurement("soil")
+        Point point = Point.measurement("soilhumidity")
                 .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
                 .addField("kit_id", soil.getKitId())
                 .addField("value", soil.getValue())

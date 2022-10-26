@@ -1,5 +1,6 @@
 package SpringBoot.Codebase.config;
 
+
 import SpringBoot.Codebase.domain.measurement.Cdc;
 import SpringBoot.Codebase.domain.measurement.Humidity;
 import SpringBoot.Codebase.domain.measurement.Soil;
@@ -94,7 +95,7 @@ public class MqttConfiguration {
             // 수신 받은 데이터 InfluxDB에 적재
             String[] token = topic.split("/");
             String kitId = token[0];
-            if (token.length > 2) { // 1 이상이면 1/sensor/sensor 임
+            if (token.length ==2) { // 1 이상이면 1/sensor/sensor 임
                 String sensor = token[2];
                 String value = message.getPayload().toString();
                 if (sensor.equals("temperature")) {
@@ -107,16 +108,33 @@ public class MqttConfiguration {
                     humidity.setKitId(kitId);
                     humidity.setValue(value);
                     sensorService.writeHumidity(humidity);
-                } else if (sensor.equals("cdc")) {
+                } else if (sensor.equals("illuminance")) {
                     Cdc cdc = new Cdc();
                     cdc.setKitId(kitId);
                     cdc.setValue(value);
                     sensorService.writeCdc(cdc);
-                } else if (sensor.equals("soil")) {
+                } else if (sensor.equals("soilhumidity")) {
                     Soil soil = new Soil();
                     soil.setKitId(kitId);
                     soil.setValue(value);
                     sensorService.writeSoil(soil);
+                }
+            }
+            else if(token.length==3){//  ex) 1/actuator/sensor/status
+                String sensor = token[2];
+                String status = token[3];
+
+                if(sensor.equals("fan")){
+
+                }
+                else if(sensor.equals("led")){
+
+                }
+                else if(sensor.equals("pump")){
+
+                }
+                else if(sensor.equals("window")){
+
                 }
             }
         };

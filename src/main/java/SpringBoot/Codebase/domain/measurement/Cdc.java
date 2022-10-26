@@ -8,7 +8,7 @@ import javax.persistence.Column;
 import java.time.Instant;
 
 @Data
-@Measurement(name = "cdc")
+@Measurement(name = "illuminance")
 public class Cdc {
     @TimeColumn
     @Column(name = "time")
