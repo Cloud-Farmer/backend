@@ -4,9 +4,9 @@ package SpringBoot.Codebase.domain.service;
 import SpringBoot.Codebase.config.MqttConfiguration;
 import SpringBoot.Codebase.domain.dto.Sensordto;
 import SpringBoot.Codebase.domain.entity.Actuator;
-import SpringBoot.Codebase.domain.measurement.Cdc;
 import SpringBoot.Codebase.domain.measurement.Humidity;
-import SpringBoot.Codebase.domain.measurement.Soil;
+import SpringBoot.Codebase.domain.measurement.Illuminance;
+import SpringBoot.Codebase.domain.measurement.SoilHumidity;
 import SpringBoot.Codebase.domain.measurement.Temperature;
 import SpringBoot.Codebase.domain.repository.ActuatorRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -40,16 +40,12 @@ public class SensorService {
     }
 
     //private final InfluxDB influxDB = InfluxDBFactory.connect("http://localhost:8086","admin","12345");
-
     public void sentToMqtt(String kitId, String sensor, String available) {
         String topic = kitId + "/actuator/" + sensor;
         mqttOrderGateway.sendToMqtt(available, topic);
         log.info("topic {} data : {}", topic, available);
     }
 
-    public void receiveToMqtt() {
-    }
-  
     public void writeTemperature(Temperature temperature) {
         Point point = Point.measurement("temperature")
                 .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
@@ -68,17 +64,17 @@ public class SensorService {
         influxDBTemplate.write(point);
     }
 
-    public void writeCdc(Cdc cdc) {
-        Point point = Point.measurement("cdc")
+    public void writeCdc(Illuminance illuminance) {
+        Point point = Point.measurement("illuminance")
                 .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
-                .addField("kit_id", cdc.getKitId())
-                .addField("value", cdc.getValue())
+                .addField("kit_id", illuminance.getKitId())
+                .addField("value", illuminance.getValue())
                 .build();
         influxDBTemplate.write(point);
     }
 
-    public void writeSoil(Soil soil) {
-        Point point = Point.measurement("soil")
+    public void writeSoil(SoilHumidity soil) {
+        Point point = Point.measurement("soilhumidity")
                 .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
                 .addField("kit_id", soil.getKitId())
                 .addField("value", soil.getValue())

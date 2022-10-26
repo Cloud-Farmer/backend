@@ -1,5 +1,6 @@
 package SpringBoot.Codebase.controller;
 
+
 import SpringBoot.Codebase.domain.service.SensorService;
 import org.influxdb.dto.QueryResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +39,7 @@ public class SubSensorController {
     @GetMapping("/actuator")
     public ResponseEntity requestActuatorData(@RequestParam("kit_id") String kitId,
                                               @RequestParam("sensor") String sensor) {
-        sensorService.receiveToMqtt();
+        //sensorService.receiveToMqtt();
         return new ResponseEntity("", HttpStatus.OK);
     }
 

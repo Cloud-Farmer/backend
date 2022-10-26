@@ -1,9 +1,9 @@
 package SpringBoot.Codebase.config;
 
 import SpringBoot.Codebase.domain.entity.Actuator;
-import SpringBoot.Codebase.domain.measurement.Cdc;
 import SpringBoot.Codebase.domain.measurement.Humidity;
-import SpringBoot.Codebase.domain.measurement.Soil;
+import SpringBoot.Codebase.domain.measurement.Illuminance;
+import SpringBoot.Codebase.domain.measurement.SoilHumidity;
 import SpringBoot.Codebase.domain.measurement.Temperature;
 import SpringBoot.Codebase.domain.service.SensorService;
 import lombok.extern.slf4j.Slf4j;
@@ -126,13 +126,13 @@ public class MqttConfiguration {
                     humidity.setKitId(kitId);
                     humidity.setValue(value);
                     sensorService.writeHumidity(humidity);
-                } else if (sensor.equals("cdc")) {
-                    Cdc cdc = new Cdc();
-                    cdc.setKitId(kitId);
-                    cdc.setValue(value);
-                    sensorService.writeCdc(cdc);
-                } else if (sensor.equals("soil")) {
-                    Soil soil = new Soil();
+                } else if (sensor.equals("illuminance")) {
+                    Illuminance illuminance = new Illuminance();
+                    illuminance.setKitId(kitId);
+                    illuminance.setValue(value);
+                    sensorService.writeCdc(illuminance);
+                } else if (sensor.equals("soilhumidity")) {
+                    SoilHumidity soil = new SoilHumidity();
                     soil.setKitId(kitId);
                     soil.setValue(value);
                     sensorService.writeSoil(soil);
