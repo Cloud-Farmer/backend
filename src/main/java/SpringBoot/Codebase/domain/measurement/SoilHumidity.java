@@ -8,8 +8,8 @@ import javax.persistence.Column;
 import java.time.Instant;
 
 @Data
-@Measurement(name = "soil")
-public class Soil {
+@Measurement(name = "soilhumidity")
+public class SoilHumidity {
         @TimeColumn
         @Column(name = "time")
         private Instant time;

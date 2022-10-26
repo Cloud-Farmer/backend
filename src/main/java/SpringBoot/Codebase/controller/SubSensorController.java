@@ -1,5 +1,6 @@
 package SpringBoot.Codebase.controller;
 
+
 import SpringBoot.Codebase.domain.service.SensorService;
 import org.influxdb.dto.QueryResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,22 @@ public class SubSensorController {
         results = sensorService.selectDataFromSensor(sensor, limit);
 
         return new ResponseEntity(results, HttpStatus.OK);
+    }
+    @GetMapping("/sensor/1m")
+    public ResponseEntity requestSensorData(@RequestParam("kit_id") String kitId,
+                                            @RequestParam("sensor") String sensor
+                                            ) {
+        List<QueryResult.Result> results = new ArrayList<>();
+
+        results = sensorService.selectDataSensor(sensor);
+
+        return new ResponseEntity(results, HttpStatus.OK);
+    }
+    @GetMapping("/actuator")
+    public ResponseEntity requestActuatorData(@RequestParam("kit_id") String kitId,
+                                              @RequestParam("sensor") String sensor) {
+        //sensorService.receiveToMqtt();
+        return new ResponseEntity("", HttpStatus.OK);
     }
 
     @GetMapping("/sensors") // TODO : SmartFarm Entity 구현하고 하기

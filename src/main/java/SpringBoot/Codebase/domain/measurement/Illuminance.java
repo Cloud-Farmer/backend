@@ -8,8 +8,8 @@ import javax.persistence.Column;
 import java.time.Instant;
 
 @Data
-@Measurement(name = "cdc")
-public class Cdc {
+@Measurement(name = "illuminance")
+public class Illuminance {
     @TimeColumn
     @Column(name = "time")
     private Instant time;
