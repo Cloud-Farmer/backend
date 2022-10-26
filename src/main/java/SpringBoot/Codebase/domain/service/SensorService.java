@@ -110,5 +110,15 @@ public class SensorService {
 
         return queryResult.getResults();
     }
-  
+    public List<QueryResult.Result> selectDataSensor(String sensor) {
+        String queryStr = String.format("SELECT * FROM %s where time > now() - 1m", sensor);
+
+        Query query = BoundParameterQuery.QueryBuilder.newQuery(queryStr)
+                .forDatabase("smartfarm")
+                .create();
+
+        QueryResult queryResult = influxDBTemplate.query(query);
+        log.info("1분간 조회 결과 {}",queryResult.getResults().toString());
+        return queryResult.getResults();
+    }
 }
