@@ -1,5 +1,6 @@
 package SpringBoot.Codebase.config;
 
+import SpringBoot.Codebase.domain.entity.Actuator;
 import SpringBoot.Codebase.domain.measurement.Cdc;
 import SpringBoot.Codebase.domain.measurement.Humidity;
 import SpringBoot.Codebase.domain.measurement.Soil;
@@ -25,6 +26,8 @@ import org.springframework.integration.mqtt.support.MqttHeaders;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHandler;
 import org.springframework.messaging.handler.annotation.Header;
+
+import java.time.LocalDateTime;
 
 @Slf4j
 @Configuration
@@ -74,7 +77,7 @@ public class MqttConfiguration {
     @Bean
     public MessageProducer inboundChannel() {
         MqttPahoMessageDrivenChannelAdapter adapter =
-                new MqttPahoMessageDrivenChannelAdapter(BROKER_URL, MQTT_SUB_CLIENT_ID, TOPIC_FILTER);
+                new MqttPahoMessageDrivenChannelAdapter(BROKER_URL, MQTT_SUB_CLIENT_ID, TOPIC_FILTER, "1/#");   // 동적으로 구독 토픽 생성하기
         adapter.setCompletionTimeout(5000);
         adapter.setConverter(new DefaultPahoMessageConverter());
         adapter.setQos(1);
@@ -90,11 +93,27 @@ public class MqttConfiguration {
 //            System.out.println("Topic:" + topic);
 //            System.out.println("Payload " + message.getPayload());
             log.info("topic: " + topic + " payload: " + message.getPayload());
-
             // 수신 받은 데이터 InfluxDB에 적재
             String[] token = topic.split("/");
+            String payload = message.getPayload().toString();
             String kitId = token[0];
-            if (token.length > 2) { // 1 이상이면 1/sensor/sensor 임
+            if (token[1].equals("actuator")) {
+                String sensor = token[2];
+                if (token.length == 3) {
+                    log.info(topic); // status 저장하기
+                    Actuator actuator = new Actuator();
+                    boolean isActive = false;
+                    if (payload.equals("1")) {
+                        isActive = true;
+                    }
+                    actuator.setStatus(isActive);
+                    actuator.setTime(LocalDateTime.now());
+                    actuator.setSensor(sensor);
+                    actuator.setKitId(Long.valueOf(kitId));
+                    sensorService.writeActuator(actuator);
+                }
+            }
+            else if (token[1].equals("sensor") && token.length > 2) {
                 String sensor = token[2];
                 String value = message.getPayload().toString();
                 if (sensor.equals("temperature")) {

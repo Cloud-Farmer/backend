@@ -3,10 +3,12 @@ package SpringBoot.Codebase.domain.service;
 
 import SpringBoot.Codebase.config.MqttConfiguration;
 import SpringBoot.Codebase.domain.dto.Sensordto;
+import SpringBoot.Codebase.domain.entity.Actuator;
 import SpringBoot.Codebase.domain.measurement.Cdc;
 import SpringBoot.Codebase.domain.measurement.Humidity;
 import SpringBoot.Codebase.domain.measurement.Soil;
 import SpringBoot.Codebase.domain.measurement.Temperature;
+import SpringBoot.Codebase.domain.repository.ActuatorRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.influxdb.dto.BoundParameterQuery;
 import org.influxdb.dto.Point;
@@ -30,8 +32,11 @@ public class SensorService {
 
     private final InfluxDBTemplate<Point> influxDBTemplate;
 
-    public SensorService(InfluxDBTemplate<Point> influxDBTemplate) {
+    private final ActuatorRepository actuatorRepository;
+    @Autowired
+    public SensorService(InfluxDBTemplate<Point> influxDBTemplate, ActuatorRepository actuatorRepository) {
         this.influxDBTemplate = influxDBTemplate;
+        this.actuatorRepository = actuatorRepository;
     }
 
     //private final InfluxDB influxDB = InfluxDBFactory.connect("http://localhost:8086","admin","12345");
@@ -40,6 +45,9 @@ public class SensorService {
         String topic = kitId + "/actuator/" + sensor;
         mqttOrderGateway.sendToMqtt(available, topic);
         log.info("topic {} data : {}", topic, available);
+    }
+
+    public void receiveToMqtt() {
     }
   
     public void writeTemperature(Temperature temperature) {
@@ -89,6 +97,10 @@ public class SensorService {
                     .build();
             influxDBTemplate.write(point);
         }
+    }
+
+    public void writeActuator(Actuator actuator) {
+        actuatorRepository.save(actuator);
     }
 
     public List<QueryResult.Result> selectDataFromSensor(String sensor, String limit) {

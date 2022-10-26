@@ -35,6 +35,13 @@ public class SubSensorController {
         return new ResponseEntity(results, HttpStatus.OK);
     }
 
+    @GetMapping("/actuator")
+    public ResponseEntity requestActuatorData(@RequestParam("kit_id") String kitId,
+                                              @RequestParam("sensor") String sensor) {
+        sensorService.receiveToMqtt();
+        return new ResponseEntity("", HttpStatus.OK);
+    }
+
     @GetMapping("/sensors") // TODO : SmartFarm Entity 구현하고 하기
     public ResponseEntity requestSensors(@RequestParam("kit_id") String kitId) {
         return new ResponseEntity("", HttpStatus.OK);
