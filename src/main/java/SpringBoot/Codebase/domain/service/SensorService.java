@@ -17,6 +17,7 @@ import org.influxdb.dto.QueryResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.influxdb.InfluxDBTemplate;
 import org.springframework.stereotype.Service;
 
@@ -39,11 +40,20 @@ public class SensorService {
         this.actuatorRepository = actuatorRepository;
     }
 
-    //private final InfluxDB influxDB = InfluxDBFactory.connect("http://localhost:8086","admin","12345");
     public void sentToMqtt(String kitId, String sensor, String available) {
         String topic = kitId + "/actuator/" + sensor;
         mqttOrderGateway.sendToMqtt(available, topic);
         log.info("topic {} data : {}", topic, available);
+    }
+
+    public boolean receivedToActuator(String kitId, String sensor) {
+        Actuator find = actuatorRepository.findByKitIdAndSensorOrderByTimeDesc(Long.valueOf(kitId), sensor, PageRequest.of(0, 1))
+                .stream().findFirst()
+                .orElseThrow(() -> {
+                    throw new RuntimeException("저장된 액츄에이터 상태가 없습니다");
+                });
+
+        return find.isStatus();
     }
 
     public void writeTemperature(Temperature temperature) {

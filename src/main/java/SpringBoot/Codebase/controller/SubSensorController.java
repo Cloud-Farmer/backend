@@ -39,8 +39,13 @@ public class SubSensorController {
     @GetMapping("/actuator")
     public ResponseEntity requestActuatorData(@RequestParam("kit_id") String kitId,
                                               @RequestParam("sensor") String sensor) {
-        //sensorService.receiveToMqtt();
-        return new ResponseEntity("", HttpStatus.OK);
+        try {
+            boolean status = sensorService.receivedToActuator(kitId, sensor);
+
+            return new ResponseEntity(status, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity(e.getMessage(), HttpStatus.NO_CONTENT);
+        }
     }
 
     @GetMapping("/sensors") // TODO : SmartFarm Entity 구현하고 하기
