@@ -1,5 +1,6 @@
 package SpringBoot.Codebase.controller;
 
+
 import SpringBoot.Codebase.domain.service.SensorService;
 import org.influxdb.dto.QueryResult;
 import org.springframework.beans.factory.annotation.Autowired;
