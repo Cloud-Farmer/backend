@@ -77,7 +77,7 @@ public class MqttConfiguration {
     @Bean
     public MessageProducer inboundChannel() {
         MqttPahoMessageDrivenChannelAdapter adapter =
-                new MqttPahoMessageDrivenChannelAdapter(BROKER_URL, MQTT_SUB_CLIENT_ID, TOPIC_FILTER, "1/#");   // 동적으로 구독 토픽 생성하기
+                new MqttPahoMessageDrivenChannelAdapter(BROKER_URL, MQTT_SUB_CLIENT_ID, TOPIC_FILTER, "1/#", "2/#");   // 동적으로 구독 토픽 생성하기
         adapter.setCompletionTimeout(5000);
         adapter.setConverter(new DefaultPahoMessageConverter());
         adapter.setQos(1);
@@ -90,18 +90,19 @@ public class MqttConfiguration {
     public MessageHandler inboundMessageHandler() {
         return message -> {
             String topic = (String) message.getHeaders().get(MqttHeaders.RECEIVED_TOPIC);
-//            System.out.println("Topic:" + topic);
-//            System.out.println("Payload " + message.getPayload());
             log.info("topic: " + topic + " payload: " + message.getPayload());
             // 수신 받은 데이터 InfluxDB에 적재
             String[] token = topic.split("/");
             String payload = message.getPayload().toString();
+
             String kitId = token[0];
-            if (token[1].equals("actuator")) {
+            String type = token[1];
+            if (type.equals("actuator")) {
                 String sensor = token[2];
                 if (token.length == 3) {
                     log.info(topic); // status 저장하기
                     Actuator actuator = new Actuator();
+
                     boolean isActive = false;
                     if (payload.equals("1")) {
                         isActive = true;
@@ -113,28 +114,27 @@ public class MqttConfiguration {
                     sensorService.writeActuator(actuator);
                 }
             }
-            else if (token[1].equals("sensor") && token.length > 2) {
+            else if (type.equals("sensor") && token.length > 2) {
                 String sensor = token[2];
-                String value = message.getPayload().toString();
                 if (sensor.equals("temperature")) {
                     Temperature temperature = new Temperature();
-                    temperature.setValue(value);
+                    temperature.setValue(payload);
                     temperature.setKitId(kitId);
                     sensorService.writeTemperature(temperature);
                 } else if (sensor.equals("humidity")) {
                     Humidity humidity = new Humidity();
                     humidity.setKitId(kitId);
-                    humidity.setValue(value);
+                    humidity.setValue(payload);
                     sensorService.writeHumidity(humidity);
                 } else if (sensor.equals("illuminance")) {
                     Illuminance illuminance = new Illuminance();
                     illuminance.setKitId(kitId);
-                    illuminance.setValue(value);
+                    illuminance.setValue(payload);
                     sensorService.writeCdc(illuminance);
                 } else if (sensor.equals("soilhumidity")) {
                     SoilHumidity soil = new SoilHumidity();
                     soil.setKitId(kitId);
-                    soil.setValue(value);
+                    soil.setValue(payload);
                     sensorService.writeSoil(soil);
                 }
             }
