@@ -41,7 +41,7 @@ public class SubSensorController {
                                             @RequestParam("date") String date){ //1m, 7d, 30d
         List<QueryResult.Result> results = new ArrayList<>();
 
-        results = sensorService.selectDataSensor(kitId, sensor);
+        results = sensorService.selectDataSensor(kitId, sensor,date);
 
         return new ResponseEntity(results, HttpStatus.OK);
     }
