@@ -109,8 +109,8 @@ public class SensorService {
         actuatorRepository.save(actuator);
     }
 
-    public List<QueryResult.Result> selectDataSensor(String kitId,String sensor, String date, String limit) {
-        String queryStr = String.format("SELECT * FROM %s where kit_id = '%s' and time > now() - %s LIMIT %s", sensor,kitId,date,limit);
+    public List<QueryResult.Result> selectDataSensor(String kitId,String sensor, String date) {
+        String queryStr = String.format("SELECT * FROM %s where kit_id = '%s' and time > now() - %s", sensor,kitId,date);
 
 
         Query query = BoundParameterQuery.QueryBuilder.newQuery(queryStr)
