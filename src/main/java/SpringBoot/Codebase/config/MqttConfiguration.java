@@ -152,6 +152,7 @@ public class MqttConfiguration {
     public MessageHandler mqttOrderMessageHandler() {
         MqttPahoMessageHandler messageHandler = new MqttPahoMessageHandler(MQTT_PUB_CLIENT_ID, mqttClientFactory());
         messageHandler.setAsync(true);
+        messageHandler.setDefaultQos(2);
         messageHandler.setDefaultTopic(TOPIC_FILTER);
         return messageHandler;
     }
