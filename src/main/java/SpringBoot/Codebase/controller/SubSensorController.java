@@ -25,23 +25,16 @@ public class SubSensorController {
         this.sensorService = sensorService;
     }
 
+
     @GetMapping("/sensor")
-    public ResponseEntity requestSensorData(@RequestParam("kit_id") String kitId,
-                                            @RequestParam("sensor") String sensor,
-                                            @RequestParam("limit") String limit) {
-        List<QueryResult.Result> results = new ArrayList<>();
-
-        results = sensorService.selectDataFromSensor(sensor, kitId, limit);
-
-        return new ResponseEntity(results, HttpStatus.OK);
-    }
-    @GetMapping("/sensor/date")
     public ResponseEntity requestSensorDataWithDate(@RequestParam("kit_id") String kitId,
                                             @RequestParam("sensor") String sensor,
-                                            @RequestParam("date") String date){ //1m, 7d, 30d
+                                            @RequestParam("date") String date,
+                                            @RequestParam("limit") String limit
+    ){ //1m, 7d, 30d
         List<QueryResult.Result> results = new ArrayList<>();
 
-        results = sensorService.selectDataSensor(kitId, sensor,date);
+        results = sensorService.selectDataSensor(kitId, sensor,date,limit);
 
         return new ResponseEntity(results, HttpStatus.OK);
     }
