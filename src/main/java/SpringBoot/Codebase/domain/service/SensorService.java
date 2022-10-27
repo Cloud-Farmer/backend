@@ -109,8 +109,8 @@ public class SensorService {
         actuatorRepository.save(actuator);
     }
 
-    public List<QueryResult.Result> selectDataFromSensor(String sensor, String limit) {
-        String queryStr = String.format("SELECT * FROM %s LIMIT %s", sensor, limit);
+    public List<QueryResult.Result> selectDataFromSensor(String kitId, String sensor, String limit) {
+        String queryStr = String.format("SELECT * FROM %s WHERE kit_id = %s LIMIT %s", sensor,kitId, limit);
 
         Query query = BoundParameterQuery.QueryBuilder.newQuery(queryStr)
                 .forDatabase("smartfarm")
@@ -120,8 +120,8 @@ public class SensorService {
 
         return queryResult.getResults();
     }
-    public List<QueryResult.Result> selectDataSensor(String sensor) {
-        String queryStr = String.format("SELECT * FROM %s where time > now() - 1m", sensor);
+    public List<QueryResult.Result> selectDataSensor(String kitId, String sensor) {
+        String queryStr = String.format("SELECT * FROM %s where kit_id = %s and time > now() - 1m", sensor, kitId);
 
         Query query = BoundParameterQuery.QueryBuilder.newQuery(queryStr)
                 .forDatabase("smartfarm")
@@ -129,6 +129,7 @@ public class SensorService {
 
         QueryResult queryResult = influxDBTemplate.query(query);
         log.info("1분간 조회 결과 {}",queryResult.getResults().toString());
+
         return queryResult.getResults();
     }
 }

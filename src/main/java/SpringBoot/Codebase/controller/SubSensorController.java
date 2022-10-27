@@ -31,7 +31,7 @@ public class SubSensorController {
                                             @RequestParam("limit") String limit) {
         List<QueryResult.Result> results = new ArrayList<>();
 
-        results = sensorService.selectDataFromSensor(sensor, limit);
+        results = sensorService.selectDataFromSensor(sensor, kitId, limit);
 
         return new ResponseEntity(results, HttpStatus.OK);
     }
@@ -41,7 +41,7 @@ public class SubSensorController {
                                             ) {
         List<QueryResult.Result> results = new ArrayList<>();
 
-        results = sensorService.selectDataSensor(sensor);
+        results = sensorService.selectDataSensor(kitId, sensor);
 
         return new ResponseEntity(results, HttpStatus.OK);
     }
