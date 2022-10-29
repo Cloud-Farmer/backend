@@ -54,6 +54,9 @@ public class MqttConfiguration {
 
     private MqttConnectOptions connectOptions() {
         MqttConnectOptions options = new MqttConnectOptions();
+        options.setConnectionTimeout(30);
+        options.setKeepAliveInterval(60);
+        options.setAutomaticReconnect(true);
         options.setCleanSession(true);
 //        options.setUserName(MQTT_USERNAME);
 //        options.setPassword(MQTT_PASSWORD.toCharArray());

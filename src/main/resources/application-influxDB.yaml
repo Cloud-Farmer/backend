@@ -3,7 +3,7 @@ spring:
     url: http://localhost:8086
     username: admin
     password: mega1234
-    bucket: test
+    bucket: smartfarm
     token: 90tcGlGZBFD-Er65i5a84lyeGqfrCz3MSkc1TuhAwA9E-YBTfntCpSmAayK-stq-UjVGb5v4SJNKYNTJhBZ_Yg==
     org: 400c6a9a27d25d56
     retention-policy: autogen

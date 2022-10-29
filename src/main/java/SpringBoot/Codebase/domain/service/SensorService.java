@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import com.influxdb.client.write.Point;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -34,12 +35,11 @@ public class SensorService {
 
     private final static Logger logger = LoggerFactory.getLogger(Sensordto.class.getSimpleName());
 
-    @Autowired
     private MqttConfiguration.MqttOrderGateway mqttOrderGateway;
 
     private char[] token = "90tcGlGZBFD-Er65i5a84lyeGqfrCz3MSkc1TuhAwA9E-YBTfntCpSmAayK-stq-UjVGb5v4SJNKYNTJhBZ_Yg==".toCharArray();
     private String org = "400c6a9a27d25d56";
-    private String bucket = "test";
+    private String bucket = "smartfarm";
     private String url = "http://localhost:8086";
     private InfluxDBClient influxDBClient;
     private WriteApiBlocking writeApi;
@@ -48,11 +48,12 @@ public class SensorService {
     private  ActuatorRepository actuatorRepository;
 
     @Autowired
-    public SensorService(ActuatorRepository actuatorRepository) {
+    public SensorService(ActuatorRepository actuatorRepository,MqttConfiguration.MqttOrderGateway mqttOrderGateway) {
         this.actuatorRepository = actuatorRepository;
         this.influxDBClient =InfluxDBClientFactory.create(url, token, org, bucket);
         this.writeApi=influxDBClient.getWriteApiBlocking();
         this.time = Instant.now().atZone(ZoneId.of("Asia/Seoul"));
+        this.mqttOrderGateway = mqttOrderGateway;
     }
 
     public void sentToMqtt(String kitId, String sensor, String available) {
@@ -72,38 +73,103 @@ public class SensorService {
     }
 
     public void writeTemperature(Temperature temperature) {
+        InfluxDBClient influxDBClient = InfluxDBClientFactory.create(url,token,org,bucket);
+        WriteApiBlocking writeApi = influxDBClient.getWriteApiBlocking();
+        ZonedDateTime time = Instant.now().atZone(ZoneId.of("Asia/Seoul"));
+
         Point point = com.influxdb.client.write.Point.measurement("temperature")
                 .addTag("kitid", temperature.getKitId())
                 .addField("value", temperature.getValue())
-                .time(Instant.from(time), WritePrecision.S);
+                .time(Instant.from(time), WritePrecision.MS);
         writeApi.writePoint(point);
+
+        String flux = "from(bucket:\"smartfarm\") |> range(start: 0)" +
+                "|> filter(fn: (r) => r[\"_measurement\"] == \"temperature\")";
+
+        QueryApi queryApi = influxDBClient.getQueryApi();
+
+        List<FluxTable> tables = queryApi.query(flux);
+        for (FluxTable fluxTable : tables) {
+            List<FluxRecord> records = fluxTable.getRecords();
+            for (FluxRecord fluxRecord : records) {
+                if(fluxRecord.getValue() ==null) continue;
+            }
+        }
     }
 
     public void writeHumidity(Humidity humidity) {
+        InfluxDBClient influxDBClient = InfluxDBClientFactory.create(url,token,org,bucket);
+        WriteApiBlocking writeApi = influxDBClient.getWriteApiBlocking();
+        ZonedDateTime time = Instant.now().atZone(ZoneId.of("Asia/Seoul"));
 
         Point point = com.influxdb.client.write.Point.measurement("humidity")
                 .addTag("kitid", humidity.getKitId())
                 .addField("value", humidity.getValue())
-                .time(Instant.from(time), WritePrecision.S);
+                .time(Instant.from(time), WritePrecision.MS);
         writeApi.writePoint(point);
+
+        String flux = "from(bucket:\"smartfarm\") |> range(start: 0)" +
+                "|> filter(fn: (r) => r[\"_measurement\"] == \"humidity\")";
+
+        QueryApi queryApi = influxDBClient.getQueryApi();
+
+        List<FluxTable> tables = queryApi.query(flux);
+        for (FluxTable fluxTable : tables) {
+            List<FluxRecord> records = fluxTable.getRecords();
+            for (FluxRecord fluxRecord : records) {
+                if(fluxRecord.getValue() ==null) continue;
+            }
+        }
     }
 
     public void writeCdc(Illuminance illuminance) {
+        InfluxDBClient influxDBClient = InfluxDBClientFactory.create(url,token,org,bucket);
+        WriteApiBlocking writeApi = influxDBClient.getWriteApiBlocking();
+        ZonedDateTime time = Instant.now().atZone(ZoneId.of("Asia/Seoul"));
 
         Point point = com.influxdb.client.write.Point.measurement("illuminance")
                 .addTag("kitid", illuminance.getKitId())
                 .addField("value", illuminance.getValue())
-                .time(Instant.from(time), WritePrecision.S);
+                .time(Instant.from(time), WritePrecision.MS);
         writeApi.writePoint(point);
+
+        String flux = "from(bucket:\"smartfarm\") |> range(start: 0)" +
+                "|> filter(fn: (r) => r[\"_measurement\"] == \"illuminance\")";
+
+        QueryApi queryApi = influxDBClient.getQueryApi();
+
+        List<FluxTable> tables = queryApi.query(flux);
+        for (FluxTable fluxTable : tables) {
+            List<FluxRecord> records = fluxTable.getRecords();
+            for (FluxRecord fluxRecord : records) {
+                if(fluxRecord.getValue() ==null) continue;
+            }
+        }
     }
 
     public void writeSoil(SoilHumidity soil) {
+        InfluxDBClient influxDBClient = InfluxDBClientFactory.create(url,token,org,bucket);
+        WriteApiBlocking writeApi = influxDBClient.getWriteApiBlocking();
+        ZonedDateTime time = Instant.now().atZone(ZoneId.of("Asia/Seoul"));
 
         Point point = Point.measurement("soilHumidity")
                 .addTag("kitid", soil.getKitId())
                 .addField("value", soil.getValue())
-                .time(Instant.from(time), WritePrecision.S);
+                .time(Instant.from(time), WritePrecision.MS);
         writeApi.writePoint(point);
+
+        String flux = "from(bucket:\"smartfarm\") |> range(start: 0)" +
+                "|> filter(fn: (r) => r[\"_measurement\"] == \"soilHumidity\")";
+
+        QueryApi queryApi = influxDBClient.getQueryApi();
+
+        List<FluxTable> tables = queryApi.query(flux);
+        for (FluxTable fluxTable : tables) {
+            List<FluxRecord> records = fluxTable.getRecords();
+            for (FluxRecord fluxRecord : records) {
+                if(fluxRecord.getValue() ==null) continue;
+            }
+        }
     }
 
     public void writeData() {
@@ -124,28 +190,21 @@ public class SensorService {
     }
 
 
-    public List<QueryResult.Result> selectDataSensor(String kitId, String sensor, String date) {
+    public List<FluxRecord> selectDataSensor(String kitId, String sensor, String date) {
 
-        String flux = "from(bucket:\"test\") |> range(start: -" + date + ")" +
-                "  |> filter(fn: (r) =>\n" +
-                "      r._measurement == \"" + kitId + "\")";
+        String flux = String.format("from(bucket:\"smartfarm\")|> range(start: -%s)" +
+                        " |> filter(fn: (r) => r[\"_measurement\"] == \"%s\")"+
+                "|> filter(fn: (r) => r[\"kitid\"] == \"%s\")",
+                date,sensor,kitId);
+
+        List<FluxRecord> records = null;
         QueryApi queryApi = influxDBClient.getQueryApi();
-
         List<FluxTable> tables = queryApi.query(flux);
         for (FluxTable fluxTable : tables) {
-            List<FluxRecord> records = fluxTable.getRecords();
-            for (FluxRecord fluxRecord : records) {
-                if (fluxRecord.getValue() == null) continue;
-                else {
-                    logger.info(fluxRecord.getTime().atZone(ZoneId.of("Asia/Seoul")) + ": " + fluxRecord.getValue() + " kitId " + fluxRecord.getValueByKey("kit_id"));
-                }
-
-            }
+            records = fluxTable.getRecords();
         }
-        QueryResult queryResult = (QueryResult) queryApi.query(flux);
-        logger.info(String.valueOf(queryResult.getResults()));
-        return queryResult.getResults();
-//       } String queryStr = String.format("SELECT * FROM %s where kit_id = '%s' and time > now() - %s", sensor,kitId,date);
+        return records;
+        //String queryStr = String.format("SELECT * FROM %s where kit_id = '%s' and time > now() - %s", sensor,kitId,date);
 //
 //
 //        Query query = BoundParameterQuery.QueryBuilder.newQuery(queryStr)

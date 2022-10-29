@@ -2,6 +2,7 @@ package SpringBoot.Codebase.controller;
 
 
 import SpringBoot.Codebase.domain.service.SensorService;
+import com.influxdb.query.FluxRecord;
 import org.influxdb.dto.QueryResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,7 +32,7 @@ public class SubSensorController {
                                             @RequestParam("sensor") String sensor,
                                             @RequestParam("date") String date
     ){ //1m, 7d, 30d
-        List<QueryResult.Result> results = new ArrayList<>();
+        List<FluxRecord> results = new ArrayList<>();
 
         results = sensorService.selectDataSensor(kitId, sensor,date);
 
