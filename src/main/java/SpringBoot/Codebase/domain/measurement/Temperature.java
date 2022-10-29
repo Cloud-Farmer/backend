@@ -14,9 +14,9 @@ public class Temperature {
     private Instant time;
 
     @Column(name = "value")
-    private String value;
+    private Float value;
 
-    @Column(name = "kit_id")
+    @Column(name = "kitid")
     private String kitId;
 
 }

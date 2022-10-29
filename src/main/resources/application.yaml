@@ -4,6 +4,6 @@ spring:
       matching-strategy: ant_path_matcher
   config:
     import:
-    - application-influxDB.properties
+    - application-influxDB.yaml
     - application-mysql.properties
     - application-mqtt.yaml

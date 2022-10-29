@@ -39,6 +39,7 @@ public class MqttConfiguration {
     private final String MQTT_PUB_CLIENT_ID = MqttAsyncClient.generateClientId();
     private final String TOPIC_FILTER;
 
+
     private final SensorService sensorService;
 
     @Autowired
@@ -118,23 +119,23 @@ public class MqttConfiguration {
                 String sensor = token[2];
                 if (sensor.equals("temperature")) {
                     Temperature temperature = new Temperature();
-                    temperature.setValue(payload);
+                    temperature.setValue(Float.valueOf(payload));
                     temperature.setKitId(kitId);
                     sensorService.writeTemperature(temperature);
                 } else if (sensor.equals("humidity")) {
                     Humidity humidity = new Humidity();
                     humidity.setKitId(kitId);
-                    humidity.setValue(payload);
+                    humidity.setValue(Float.valueOf(payload));
                     sensorService.writeHumidity(humidity);
                 } else if (sensor.equals("illuminance")) {
                     Illuminance illuminance = new Illuminance();
                     illuminance.setKitId(kitId);
-                    illuminance.setValue(payload);
+                    illuminance.setValue(Float.valueOf(payload));
                     sensorService.writeCdc(illuminance);
                 } else if (sensor.equals("soilhumidity")) {
                     SoilHumidity soil = new SoilHumidity();
                     soil.setKitId(kitId);
-                    soil.setValue(payload);
+                    soil.setValue(Float.valueOf(payload));
                     sensorService.writeSoil(soil);
                 }
             }

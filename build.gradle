@@ -20,11 +20,9 @@ dependencies {
 	implementation 'org.springframework.integration:spring-integration-mqtt'
 	implementation "org.springframework.integration:spring-integration-stream"
 	implementation 'io.springfox:springfox-boot-starter:3.0.0' // Swagger3
-
+	implementation group: 'com.influxdb', name: 'influxdb-client-java', version: '6.6.0'
 	implementation group: 'org.influxdb', name: 'influxdb-java', version: '2.23'
-	implementation 'com.github.miwurster:spring-data-influxdb:1.8'
 	implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.4.2'
-
 	compileOnly group: 'mysql', name: 'mysql-connector-java', version: '8.0.22'
 
 	implementation 'org.projectlombok:lombok:1.18.20'

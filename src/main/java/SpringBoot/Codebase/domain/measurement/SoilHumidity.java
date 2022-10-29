@@ -15,7 +15,7 @@ public class SoilHumidity {
         private Instant time;
 
         @Column(name = "value")
-        private String value;
+        private Float value;
 
         @Column(name = "kitid")
         private String kitId;

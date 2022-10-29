@@ -18,7 +18,7 @@ import java.util.List;
 @RequestMapping("/api")
 public class SubSensorController {
 
-    private SensorService sensorService;
+    private final SensorService sensorService;
 
     @Autowired
     public SubSensorController(SensorService sensorService) {
@@ -29,12 +29,11 @@ public class SubSensorController {
     @GetMapping("/sensor")
     public ResponseEntity requestSensorDataWithDate(@RequestParam("kit_id") String kitId,
                                             @RequestParam("sensor") String sensor,
-                                            @RequestParam("date") String date,
-                                            @RequestParam("limit") String limit
+                                            @RequestParam("date") String date
     ){ //1m, 7d, 30d
         List<QueryResult.Result> results = new ArrayList<>();
 
-        results = sensorService.selectDataSensor(kitId, sensor,date,limit);
+        results = sensorService.selectDataSensor(kitId, sensor,date);
 
         return new ResponseEntity(results, HttpStatus.OK);
     }
@@ -55,3 +54,4 @@ public class SubSensorController {
         return new ResponseEntity("", HttpStatus.OK);
     }
 }
+
