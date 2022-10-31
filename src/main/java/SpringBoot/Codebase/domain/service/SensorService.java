@@ -20,6 +20,7 @@ import org.influxdb.dto.QueryResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import com.influxdb.client.write.Point;
 import org.springframework.stereotype.Service;
@@ -37,10 +38,17 @@ public class SensorService {
 
     private MqttConfiguration.MqttOrderGateway mqttOrderGateway;
 
-    private char[] token = "90tcGlGZBFD-Er65i5a84lyeGqfrCz3MSkc1TuhAwA9E-YBTfntCpSmAayK-stq-UjVGb5v4SJNKYNTJhBZ_Yg==".toCharArray();
-    private String org = "400c6a9a27d25d56";
-    private String bucket = "smartfarm";
-    private String url = "http://localhost:8086";
+    @Value("${spring.influxdb2.token}")
+    private char [] token;
+
+    @Value("${spring.influxdb2.org}")
+    private String org;
+
+    @Value("${spring.influxdb2.bucket}")
+    private String bucket;
+
+    @Value("${spring.influxdb2.url}")
+    private String url;
     private InfluxDBClient influxDBClient;
     private WriteApiBlocking writeApi;
     private ZonedDateTime time;
