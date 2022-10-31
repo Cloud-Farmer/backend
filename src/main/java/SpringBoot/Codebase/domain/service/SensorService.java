@@ -16,7 +16,6 @@ import com.influxdb.client.WriteApiBlocking;
 import com.influxdb.client.domain.WritePrecision;
 import com.influxdb.query.FluxRecord;
 import com.influxdb.query.FluxTable;
-import org.influxdb.dto.QueryResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +23,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import com.influxdb.client.write.Point;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -59,9 +57,6 @@ public class SensorService {
     @Autowired
     public SensorService(ActuatorRepository actuatorRepository,MqttConfiguration.MqttOrderGateway mqttOrderGateway) {
         this.actuatorRepository = actuatorRepository;
-        this.influxDBClient =InfluxDBClientFactory.create(url, token, org, bucket);
-        this.writeApi=influxDBClient.getWriteApiBlocking();
-        this.time = Instant.now().atZone(ZoneId.of("Asia/Seoul"));
         this.mqttOrderGateway = mqttOrderGateway;
     }
 

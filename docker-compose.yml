@@ -11,7 +11,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: "mega123"
 
   influxdb:
-    container_name: influxdb-test
+    container_name: influxdb
     image: influxdb:2.2-alpine
     ports:
       - "8086:8086"
