@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import com.influxdb.client.write.Point;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -195,12 +196,14 @@ public class SensorService {
 
 
     public List<FluxRecord> selectDataSensor(String kitId, String sensor, String date) {
-
+        InfluxDBClient influxDBClient = InfluxDBClientFactory.create(url,token,org,bucket);
+        WriteApiBlocking writeApi = influxDBClient.getWriteApiBlocking();
+        ZonedDateTime time = Instant.now().atZone(ZoneId.of("Asia/Seoul"));
         String flux = String.format("from(bucket:\"smartfarm\")|> range(start: -%s)" +
-                        " |> filter(fn: (r) => r[\"_measurement\"] == \"%s\")"+
-                "|> filter(fn: (r) => r[\"kitid\"] == \"%s\")",
-                date,sensor,kitId);
-
+                        " |> filter(fn: (r) => r[\"_measurement\"] == \"%s\")" +
+                         "|> filter(fn: (r) => r[\"kitid\"] == \"%s\")" +
+                        "|> yield(name: \"mean\")",
+                            date,sensor,kitId);
         List<FluxRecord> records = null;
         QueryApi queryApi = influxDBClient.getQueryApi();
         List<FluxTable> tables = queryApi.query(flux);

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -33,10 +34,10 @@ public class SubSensorController {
                                             @RequestParam("date") String date
     ){ //1m, 7d, 30d
         List<FluxRecord> results = new ArrayList<>();
-
         results = sensorService.selectDataSensor(kitId, sensor,date);
-
         return new ResponseEntity(results, HttpStatus.OK);
+
+
     }
     @GetMapping("/actuator")
     public ResponseEntity requestActuatorData(@RequestParam("kit_id") String kitId,
