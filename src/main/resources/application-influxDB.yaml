@@ -3,7 +3,7 @@ spring:
     url: http://203.241.228.50:8086
     username: mega
     password: mega123!@#
-    bucket: mega
+    bucket: smartfarm
     token: oSghfVuohVj8bD8cgPx_Ros-9cnYT4XKhIMSEETCxkBQRR3HQtfNLjm9QeR9EV7sQMd0_b151HGDHdL3YTdBNQ==
     org: 95f96cb422f582d3
     retention-policy: autogen

@@ -49,6 +49,7 @@ public class SensorService {
 
     @Value("${spring.influxdb2.url}")
     private String url;
+
     private InfluxDBClient influxDBClient;
     private WriteApiBlocking writeApi;
     private ZonedDateTime time;
