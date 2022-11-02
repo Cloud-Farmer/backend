@@ -6,9 +6,14 @@ import SpringBoot.Codebase.domain.measurement.Illuminance;
 import SpringBoot.Codebase.domain.measurement.SoilHumidity;
 import SpringBoot.Codebase.domain.measurement.Temperature;
 import SpringBoot.Codebase.domain.service.SensorService;
+import com.influxdb.client.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -95,13 +100,198 @@ public class MqttConfiguration {
         return message -> {
             String topic = (String) message.getHeaders().get(MqttHeaders.RECEIVED_TOPIC);
             log.info("topic: " + topic + " payload: " + message.getPayload());
-            // 수신 받은 데이터 InfluxDB에 적재
             String[] token = topic.split("/");
-            String payload = message.getPayload().toString();
+            //String payload = message.getPayload().toString();
 
-            String kitId = token[0];
-            String type = token[1];
-            if (type.equals("actuator")) {
+            // 수신 받은 데이터 InfluxDB에 적재
+            String kitId = token[0]; //kitId
+//            String type = token[1]; // actuator or sensor
+
+
+            if (kitId.equals("1")) {
+                JSONParser parser = new JSONParser();
+                try {
+                    JSONObject object = (JSONObject) parser.parse(message.getPayload().toString());
+                    JSONArray sensorArr = (JSONArray) object.get("sensor");
+                    JSONArray actuatorArr = (JSONArray) object.get("actuator");
+                    for(int i=0;i<sensorArr.size();i++){
+                        object = (JSONObject)sensorArr.get(i);
+                        if(object.get(i).equals("temperature")){
+                            Temperature temperature = new Temperature();
+                            temperature.setValue((Float) object.get(i));
+                            temperature.setKitId(kitId);
+                            sensorService.writeTemperature(temperature);
+                        }
+                        if(object.get(i).equals("illuminance")){
+                            Illuminance illuminance = new Illuminance();
+                            illuminance.setValue((Float) object.get(i));
+                            illuminance.setKitId(kitId);
+                            sensorService.writeCdc(illuminance);
+                        }
+                        if(object.get(i).equals("humidity")){
+                            Humidity humidity = new Humidity();
+                            humidity.setValue((Float) object.get(i));
+                            humidity.setKitId(kitId);
+                            sensorService.writeHumidity(humidity);
+                        }
+                        if(object.get(i).equals("soilHumidity")){
+                            SoilHumidity soilHumidity = new SoilHumidity();
+                            soilHumidity.setValue((Float) object.get(i));
+                            soilHumidity.setKitId(kitId);
+                            sensorService.writeSoil(soilHumidity);
+                        }
+                    }
+                    for (int i=0;i<actuatorArr.size();i++){
+                        object = (JSONObject)actuatorArr.get(i);
+                        if(object.get(i).equals("temperature")){
+                            Actuator actuator = new Actuator();
+
+                            boolean isActive = false;
+                            if (object.get(i) =="true") {
+                                isActive = true;
+                            }
+                            actuator.setStatus(isActive);
+                            actuator.setTime(LocalDateTime.now());
+                            actuator.setSensor("temperature");
+                            actuator.setKitId(Long.valueOf(kitId));
+                            sensorService.writeActuator(actuator);
+                        }
+                        if(object.get(i).equals("illuminance")){
+                            Actuator actuator = new Actuator();
+
+                            boolean isActive = false;
+                            if (object.get(i) =="true") {
+                                isActive = true;
+                            }
+                            actuator.setStatus(isActive);
+                            actuator.setTime(LocalDateTime.now());
+                            actuator.setSensor("illuminance");
+                            actuator.setKitId(Long.valueOf(kitId));
+                            sensorService.writeActuator(actuator);
+                        }
+                        if(object.get(i).equals("humidity")){
+                            Actuator actuator = new Actuator();
+
+                            boolean isActive = false;
+                            if (object.get(i) =="true") {
+                                isActive = true;
+                            }
+                            actuator.setStatus(isActive);
+                            actuator.setTime(LocalDateTime.now());
+                            actuator.setSensor("humidity");
+                            actuator.setKitId(Long.valueOf(kitId));
+                            sensorService.writeActuator(actuator);
+                        }
+                        if(object.get(i).equals("soilHumidity")){
+                            Actuator actuator = new Actuator();
+
+                            boolean isActive = false;
+                            if (object.get(i) =="true") {
+                                isActive = true;
+                            }
+                            actuator.setStatus(isActive);
+                            actuator.setTime(LocalDateTime.now());
+                            actuator.setSensor("soilHumidity");
+                            actuator.setKitId(Long.valueOf(kitId));
+                            sensorService.writeActuator(actuator);
+                        }
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (kitId.equals("2")) {
+                JSONParser parser = new JSONParser();
+                try {
+                    JSONObject object = (JSONObject) parser.parse(message.getPayload().toString());
+                    JSONArray sensor = (JSONArray) object.get("sensor");
+                    for(int i=0;i<sensor.size();i++){
+                        object = (JSONObject)sensor.get(i);
+                        if(object.get(i).equals("temperature")){
+                            Temperature temperature = new Temperature();
+                            temperature.setValue((Float) object.get(i));
+                            temperature.setKitId(kitId);
+                            sensorService.writeTemperature(temperature);
+                        }
+                        if(object.get(i).equals("illuminance")){
+                            Illuminance illuminance = new Illuminance();
+                            illuminance.setValue((Float) object.get(i));
+                            illuminance.setKitId(kitId);
+                            sensorService.writeCdc(illuminance);
+                        }
+                        if(object.get(i).equals("humidity")){
+                            Humidity humidity = new Humidity();
+                            humidity.setValue((Float) object.get(i));
+                            humidity.setKitId(kitId);
+                            sensorService.writeHumidity(humidity);
+                        }
+                        if(object.get(i).equals("soilHumidity")){
+                            SoilHumidity soilHumidity = new SoilHumidity();
+                            soilHumidity.setValue((Float) object.get(i));
+                            soilHumidity.setKitId(kitId);
+                            sensorService.writeSoil(soilHumidity);
+                        }
+                    }
+                    for (int i=0;i<actuatorArr.size();i++){
+                        object = (JSONObject)actuatorArr.get(i);
+                        if(object.get(i).equals("temperature")){
+                            Actuator actuator = new Actuator();
+
+                            boolean isActive = false;
+                            if (object.get(i) =="true") {
+                                isActive = true;
+                            }
+                            actuator.setStatus(isActive);
+                            actuator.setTime(LocalDateTime.now());
+                            actuator.setSensor("temperature");
+                            actuator.setKitId(Long.valueOf(kitId));
+                            sensorService.writeActuator(actuator);
+                        }
+                        if(object.get(i).equals("illuminance")){
+                            Actuator actuator = new Actuator();
+
+                            boolean isActive = false;
+                            if (object.get(i) =="true") {
+                                isActive = true;
+                            }
+                            actuator.setStatus(isActive);
+                            actuator.setTime(LocalDateTime.now());
+                            actuator.setSensor("illuminance");
+                            actuator.setKitId(Long.valueOf(kitId));
+                            sensorService.writeActuator(actuator);
+                        }
+                        if(object.get(i).equals("humidity")){
+                            Actuator actuator = new Actuator();
+
+                            boolean isActive = false;
+                            if (object.get(i) =="true") {
+                                isActive = true;
+                            }
+                            actuator.setStatus(isActive);
+                            actuator.setTime(LocalDateTime.now());
+                            actuator.setSensor("humidity");
+                            actuator.setKitId(Long.valueOf(kitId));
+                            sensorService.writeActuator(actuator);
+                        }
+                        if(object.get(i).equals("soilHumidity")){
+                            Actuator actuator = new Actuator();
+
+                            boolean isActive = false;
+                            if (object.get(i) =="true") {
+                                isActive = true;
+                            }
+                            actuator.setStatus(isActive);
+                            actuator.setTime(LocalDateTime.now());
+                            actuator.setSensor("soilHumidity");
+                            actuator.setKitId(Long.valueOf(kitId));
+                            sensorService.writeActuator(actuator);
+                        }
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+           /* if (type.equals("actuator")) {
                 String sensor = token[2];
                 if (token.length == 3) {
                     log.info(topic); // status 저장하기
@@ -117,8 +307,8 @@ public class MqttConfiguration {
                     actuator.setKitId(Long.valueOf(kitId));
                     sensorService.writeActuator(actuator);
                 }
-            }
-            else if (type.equals("sensor") && token.length > 2) {
+            }*/
+            /*else if (type.equals("sensor") && token.length > 2) {
                 String sensor = token[2];
                 if (sensor.equals("temperature")) {
                     Temperature temperature = new Temperature();
@@ -141,7 +331,7 @@ public class MqttConfiguration {
                     soil.setValue(Float.valueOf(payload));
                     sensorService.writeSoil(soil);
                 }
-            }
+            }*/
         };
     }
 
