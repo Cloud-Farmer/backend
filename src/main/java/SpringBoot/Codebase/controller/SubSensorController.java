@@ -36,8 +36,6 @@ public class SubSensorController {
         List<FluxRecord> results = new ArrayList<>();
         results = sensorService.selectDataSensor(kitId, sensor,date);
         return new ResponseEntity(results, HttpStatus.OK);
-
-
     }
     @GetMapping("/actuator")
     public ResponseEntity requestActuatorData(@RequestParam("kit_id") String kitId,

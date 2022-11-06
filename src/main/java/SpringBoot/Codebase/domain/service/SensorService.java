@@ -194,7 +194,6 @@ public class SensorService {
         actuatorRepository.save(actuator);
     }
 
-
     public List<FluxRecord> selectDataSensor(String kitId, String sensor, String date) {
         InfluxDBClient influxDBClient = InfluxDBClientFactory.create(url,token,org,bucket);
         WriteApiBlocking writeApi = influxDBClient.getWriteApiBlocking();
