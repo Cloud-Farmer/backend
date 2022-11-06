@@ -9,10 +9,8 @@ import SpringBoot.Codebase.domain.service.SensorService;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -85,7 +83,7 @@ public class MqttConfiguration {
     @Bean
     public MessageProducer inboundChannel() {
         MqttPahoMessageDrivenChannelAdapter adapter =
-                new MqttPahoMessageDrivenChannelAdapter(BROKER_URL, MQTT_SUB_CLIENT_ID, TOPIC_FILTER, "1/#", "2/#");   // 동적으로 구독 토픽 생성하기
+                new MqttPahoMessageDrivenChannelAdapter(BROKER_URL, MQTT_SUB_CLIENT_ID, TOPIC_FILTER, "1/json", "2/json");   // 동적으로 구독 토픽 생성하기
         adapter.setCompletionTimeout(5000);
         adapter.setConverter(new DefaultPahoMessageConverter());
         adapter.setQos(1);
@@ -108,174 +106,59 @@ public class MqttConfiguration {
             JSONParser parser = new JSONParser();
             try {
                 JSONObject object = (JSONObject) parser.parse(payload);
-                JSONArray sensor = (JSONArray) object.get("sensor");
-                JSONObject findSensor=null;
-                for(int i=0;i<sensor.size();i++)
-                    findSensor = (JSONObject) sensor.get(i);
+                JSONObject sensor = (JSONObject) object.get("Sensor");
+                JSONObject actuator= (JSONObject) object.get("Actuator");
 
                 Temperature temperature = new Temperature();
-                temperature.setValue((Float) findSensor.get("temperature"));
+                temperature.setValue(Float.valueOf(sensor.get("temperature").toString()));
                 temperature.setKitId(kitId);
                 sensorService.writeTemperature(temperature);
 
                 Illuminance illuminance = new Illuminance();
-                illuminance.setValue((Float) findSensor.get("illuminance"));
+                illuminance.setValue(Float.valueOf(sensor.get("illuminance").toString()));
                 illuminance.setKitId(kitId);
                 sensorService.writeCdc(illuminance);
 
                 Humidity humidity = new Humidity();
-                humidity.setValue((Float) findSensor.get("humidity"));
+                humidity.setValue(Float.valueOf(sensor.get("humidity").toString()));
                 humidity.setKitId(kitId);
                 sensorService.writeHumidity(humidity);
 
                 SoilHumidity soilHumidity = new SoilHumidity();
-                soilHumidity.setValue((Float) findSensor.get("soilHumidity"));
+                soilHumidity.setValue(Float.valueOf(sensor.get("soilhumidity").toString()));
                 soilHumidity.setKitId(kitId);
                 sensorService.writeSoil(soilHumidity);
-                sensorService.writeTemperature(temperature);
-
-                JSONArray actuator = (JSONArray) object.get("actuator");
-                JSONObject findAct=null;
-
-                for(int i=0;i<sensor.size();i++)
-                    findAct = (JSONObject) actuator.get(i);
 
                 Actuator window = new Actuator();
                 window.setSensor("window");
                 window.setKitId(Long.valueOf(kitId));
                 window.setTime(LocalDateTime.now());
-                window.setStatus((Boolean) findAct.get("window"));
+                window.setStatus(Boolean.valueOf(actuator.get("window").toString()));
                 sensorService.writeActuator(window);
 
                 Actuator pump = new Actuator();
                 pump.setSensor("pump");
                 pump.setKitId(Long.valueOf(kitId));
                 pump.setTime(LocalDateTime.now());
-                pump.setStatus((Boolean) findAct.get("pump"));
+                pump.setStatus(Boolean.valueOf(actuator.get("pump").toString()));
                 sensorService.writeActuator(pump);
 
                 Actuator led = new Actuator();
                 led.setSensor("led");
                 led.setKitId(Long.valueOf(kitId));
                 led.setTime(LocalDateTime.now());
-                led.setStatus((Boolean) findAct.get("led"));
+                led.setStatus(Boolean.valueOf(actuator.get("led").toString()));
                 sensorService.writeActuator(led);
 
                 Actuator fan = new Actuator();
                 fan.setSensor("fan");
                 fan.setKitId(Long.valueOf(kitId));
                 fan.setTime(LocalDateTime.now());
-                fan.setStatus((Boolean) findAct.get("fan"));
+                fan.setStatus(Boolean.valueOf(actuator.get("fan").toString()));
                 sensorService.writeActuator(fan);
-
-            } catch (ParseException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
-                /*try {
-                    JSONParser parser = new JSONParser();
-                    JSONObject object = (JSONObject) parser.parse(payload);
-                    JSONObject sensor = (JSONObject) object.get("sensor");
-                    Float searchTem = (Float) sensor.get("temperature");
-                    Float  searchIll= (Float) sensor.get("illuminance");
-                    Float searchhum = (Float) sensor.get("humidity");
-                    Float searchsoil = (Float) sensor.get("soilHumidity");
-
-                    Temperature temperature = new Temperature();
-                    temperature.setValue(searchTem);
-                    temperature.setKitId(kitId);
-                    sensorService.writeTemperature(temperature);
-
-                    Illuminance illuminance = new Illuminance();
-                    illuminance.setValue(searchIll);
-                    illuminance.setKitId(kitId);
-                    sensorService.writeCdc(illuminance);
-
-                    Humidity humidity = new Humidity();
-                    humidity.setValue(searchhum);
-                    humidity.setKitId(kitId);
-                    sensorService.writeHumidity(humidity);
-
-                    SoilHumidity soilHumidity = new SoilHumidity();
-                    soilHumidity.setValue(searchsoil);
-                    soilHumidity.setKitId(kitId);
-                    sensorService.writeSoil(soilHumidity);
-                    JSONObject searchActuator = (JSONObject) object.get("actuator");
-                    String actWindow = (String) searchActuator.get("window");
-                    String actPump = (String) searchActuator.get("pump");
-                    String actLed = (String) searchActuator.get("led");
-                    String actFan = (String) searchActuator.get("fan");
-
-                    Actuator window = new Actuator();
-                    window.setSensor("window");
-                    window.setKitId(Long.valueOf(kitId));
-                    window.setTime(LocalDateTime.now());
-                    window.setStatus(Boolean.parseBoolean(actWindow));
-                    sensorService.writeActuator(window);
-
-                    Actuator pump = new Actuator();
-                    pump.setSensor("pump");
-                    pump.setKitId(Long.valueOf(kitId));
-                    pump.setTime(LocalDateTime.now());
-                    pump.setStatus(Boolean.parseBoolean(actPump));
-                    sensorService.writeActuator(pump);
-
-                    Actuator led = new Actuator();
-                    led.setSensor("led");
-                    led.setKitId(Long.valueOf(kitId));
-                    led.setTime(LocalDateTime.now());
-                    led.setStatus(Boolean.parseBoolean(actLed));
-                    sensorService.writeActuator(led);
-
-                    Actuator fan = new Actuator();
-                    fan.setSensor("fan");
-                    fan.setKitId(Long.valueOf(kitId));
-                    fan.setTime(LocalDateTime.now());
-                    fan.setStatus(Boolean.parseBoolean(actFan));
-                    sensorService.writeActuator(fan);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }*/
-            /*if (type.equals("actuator")) {
-                String sensor = token[2];
-                if (token.length == 3) {
-                    log.info(topic); // status 저장하기
-                    Actuator actuator = new Actuator();
-
-                    boolean isActive = false;
-                    if (payload.equals("1")) {
-                        isActive = true;
-                    }
-                    actuator.setStatus(isActive);
-                    actuator.setTime(LocalDateTime.now());
-                    actuator.setSensor(sensor);
-                    actuator.setKitId(Long.valueOf(kitId));
-                    sensorService.writeActuator(actuator);
-                }
-            }
-            else if (type.equals("sensor") && token.length > 2) {
-                String sensor = token[2];
-                if (sensor.equals("temperature")) {
-                    Temperature temperature = new Temperature();
-                    temperature.setValue(Float.valueOf(payload));
-                    temperature.setKitId(kitId);
-                    sensorService.writeTemperature(temperature);
-                } else if (sensor.equals("humidity")) {
-                    Humidity humidity = new Humidity();
-                    humidity.setKitId(kitId);
-                    humidity.setValue(Float.valueOf(payload));
-                    sensorService.writeHumidity(humidity);
-                } else if (sensor.equals("illuminance")) {
-                    Illuminance illuminance = new Illuminance();
-                    illuminance.setKitId(kitId);
-                    illuminance.setValue(Float.valueOf(payload));
-                    sensorService.writeCdc(illuminance);
-                } else if (sensor.equals("soilhumidity")) {
-                    SoilHumidity soil = new SoilHumidity();
-                    soil.setKitId(kitId);
-                    soil.setValue(Float.valueOf(payload));
-                    sensorService.writeSoil(soil);
-                }
-            }*/
         };
     }
 
