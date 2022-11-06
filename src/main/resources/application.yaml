@@ -2,8 +2,10 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
+  jpa:
+    open-in-view: false
   config:
     import:
-    - application-influxDB.properties
+    - application-influxDB.yaml
     - application-mysql.properties
     - application-mqtt.yaml

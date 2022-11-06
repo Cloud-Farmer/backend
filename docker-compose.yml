@@ -10,24 +10,21 @@ services:
       SPRING_DATASOURCE_USERNAME: "root"
       SPRING_DATASOURCE_PASSWORD: "mega123"
 
-#  influxdb:
-#    container_name: influxdb
-#    image: influxdb:1.8.10
-#    ports:
-#      - "8086:8086"
-#    hostname: influxdb
-#    environment:
-#      - INFLUXDB_DB:smartfarm
-#      - INFLUXDB_ADMIN_USER:admin
-#      - INFLUXDB_ADMIN_PASSWORD=mega123
-#      - INFLUXDB_HTTP_AUTH_ENABLED=false
-#      - INFLUXDB_HTTP_FLUX_ENABLED=true
-#      - INFLUXDB_RETENTION_CHECK_INTERVAL=24h
-#      - INFLUXDB_HTTP_LOG_ENABLED:true
-#      - INFLUXDB_RETENTION_ENABLED:true
-#      - INFLUXDB_SHARD_PRECREATION_ENABLED:true
-#    volumes:
-#      - ./influxdb:/var/lib/influxdb
+  influxdb:
+    container_name: influxdb
+    image: influxdb:2.2-alpine
+    ports:
+      - "8086:8086"
+    hostname: influxdb
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=mega
+      - DOCKER_INFLUXDB_INIT_PASSWORD=mega123!@#
+      - DOCKER_INFLUXDB_INIT_BUCKET=smartfarm
+      - DOCKER_INFLUXDB_INIT_ORG=95f96cb422f582d3
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=oSghfVuohVj8bD8cgPx_Ros-9cnYT4XKhIMSEETCxkBQRR3HQtfNLjm9QeR9EV7sQMd0_b151HGDHdL3YTdBNQ==
+    volumes:
+      - ./influxdb:/var/lib/influxdb
 #  mysql:
 #    container_name: mysql5.7
 #    image: library/mysql:5.7

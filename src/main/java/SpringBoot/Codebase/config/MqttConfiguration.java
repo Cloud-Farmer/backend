@@ -9,6 +9,8 @@ import SpringBoot.Codebase.domain.service.SensorService;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -39,6 +41,7 @@ public class MqttConfiguration {
     private final String MQTT_PUB_CLIENT_ID = MqttAsyncClient.generateClientId();
     private final String TOPIC_FILTER;
 
+
     private final SensorService sensorService;
 
     @Autowired
@@ -53,6 +56,9 @@ public class MqttConfiguration {
 
     private MqttConnectOptions connectOptions() {
         MqttConnectOptions options = new MqttConnectOptions();
+        options.setConnectionTimeout(30);
+        options.setKeepAliveInterval(60);
+        options.setAutomaticReconnect(true);
         options.setCleanSession(true);
 //        options.setUserName(MQTT_USERNAME);
 //        options.setPassword(MQTT_PASSWORD.toCharArray());
@@ -77,7 +83,7 @@ public class MqttConfiguration {
     @Bean
     public MessageProducer inboundChannel() {
         MqttPahoMessageDrivenChannelAdapter adapter =
-                new MqttPahoMessageDrivenChannelAdapter(BROKER_URL, MQTT_SUB_CLIENT_ID, TOPIC_FILTER, "1/#", "2/#");   // 동적으로 구독 토픽 생성하기
+                new MqttPahoMessageDrivenChannelAdapter(BROKER_URL, MQTT_SUB_CLIENT_ID, TOPIC_FILTER, "1/json", "2/json");   // 동적으로 구독 토픽 생성하기
         adapter.setCompletionTimeout(5000);
         adapter.setConverter(new DefaultPahoMessageConverter());
         adapter.setQos(1);
@@ -91,52 +97,67 @@ public class MqttConfiguration {
         return message -> {
             String topic = (String) message.getHeaders().get(MqttHeaders.RECEIVED_TOPIC);
             log.info("topic: " + topic + " payload: " + message.getPayload());
-            // 수신 받은 데이터 InfluxDB에 적재
             String[] token = topic.split("/");
             String payload = message.getPayload().toString();
 
-            String kitId = token[0];
-            String type = token[1];
-            if (type.equals("actuator")) {
-                String sensor = token[2];
-                if (token.length == 3) {
-                    log.info(topic); // status 저장하기
-                    Actuator actuator = new Actuator();
+            // 수신 받은 데이터 InfluxDB에 적재
+            String kitId = token[0]; //kitId
+            String type = token[1]; // actuator or sensor
+            JSONParser parser = new JSONParser();
+            try {
+                JSONObject object = (JSONObject) parser.parse(payload);
+                JSONObject sensor = (JSONObject) object.get("Sensor");
+                JSONObject actuator= (JSONObject) object.get("Actuator");
 
-                    boolean isActive = false;
-                    if (payload.equals("1")) {
-                        isActive = true;
-                    }
-                    actuator.setStatus(isActive);
-                    actuator.setTime(LocalDateTime.now());
-                    actuator.setSensor(sensor);
-                    actuator.setKitId(Long.valueOf(kitId));
-                    sensorService.writeActuator(actuator);
-                }
-            }
-            else if (type.equals("sensor") && token.length > 2) {
-                String sensor = token[2];
-                if (sensor.equals("temperature")) {
-                    Temperature temperature = new Temperature();
-                    temperature.setValue(payload);
-                    temperature.setKitId(kitId);
-                    sensorService.writeTemperature(temperature);
-                } else if (sensor.equals("humidity")) {
-                    Humidity humidity = new Humidity();
-                    humidity.setKitId(kitId);
-                    humidity.setValue(payload);
-                    sensorService.writeHumidity(humidity);
-                } else if (sensor.equals("illuminance")) {
-                    Illuminance illuminance = new Illuminance();
-                    illuminance.setKitId(kitId);
-                    illuminance.setValue(payload);
-                    sensorService.writeCdc(illuminance);
-                } else if (sensor.equals("soilhumidity")) {
-                    SoilHumidity soil = new SoilHumidity();
-                    soil.setKitId(kitId);
-                    soil.setValue(payload);
-                    sensorService.writeSoil(soil);
-                }
+                Temperature temperature = new Temperature();
+                temperature.setValue(Float.valueOf(sensor.get("temperature").toString()));
+                temperature.setKitId(kitId);
+                sensorService.writeTemperature(temperature);
+
+                Illuminance illuminance = new Illuminance();
+                illuminance.setValue(Float.valueOf(sensor.get("illuminance").toString()));
+                illuminance.setKitId(kitId);
+                sensorService.writeCdc(illuminance);
+
+                Humidity humidity = new Humidity();
+                humidity.setValue(Float.valueOf(sensor.get("humidity").toString()));
+                humidity.setKitId(kitId);
+                sensorService.writeHumidity(humidity);
+
+                SoilHumidity soilHumidity = new SoilHumidity();
+                soilHumidity.setValue(Float.valueOf(sensor.get("soilhumidity").toString()));
+                soilHumidity.setKitId(kitId);
+                sensorService.writeSoil(soilHumidity);
+
+                Actuator window = new Actuator();
+                window.setSensor("window");
+                window.setKitId(Long.valueOf(kitId));
+                window.setTime(LocalDateTime.now());
+                window.setStatus(Boolean.valueOf(actuator.get("window").toString()));
+                sensorService.writeActuator(window);
+
+                Actuator pump = new Actuator();
+                pump.setSensor("pump");
+                pump.setKitId(Long.valueOf(kitId));
+                pump.setTime(LocalDateTime.now());
+                pump.setStatus(Boolean.valueOf(actuator.get("pump").toString()));
+                sensorService.writeActuator(pump);
+
+                Actuator led = new Actuator();
+                led.setSensor("led");
+                led.setKitId(Long.valueOf(kitId));
+                led.setTime(LocalDateTime.now());
+                led.setStatus(Boolean.valueOf(actuator.get("led").toString()));
+                sensorService.writeActuator(led);
+
+                Actuator fan = new Actuator();
+                fan.setSensor("fan");
+                fan.setKitId(Long.valueOf(kitId));
+                fan.setTime(LocalDateTime.now());
+                fan.setStatus(Boolean.valueOf(actuator.get("fan").toString()));
+                sensorService.writeActuator(fan);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         };
     }

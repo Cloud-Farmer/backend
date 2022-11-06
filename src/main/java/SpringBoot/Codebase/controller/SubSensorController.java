@@ -2,6 +2,7 @@ package SpringBoot.Codebase.controller;
 
 
 import SpringBoot.Codebase.domain.service.SensorService;
+import com.influxdb.query.FluxRecord;
 import org.influxdb.dto.QueryResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,13 +13,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api")
 public class SubSensorController {
 
-    private SensorService sensorService;
+    private final SensorService sensorService;
 
     @Autowired
     public SubSensorController(SensorService sensorService) {
@@ -31,10 +33,8 @@ public class SubSensorController {
                                             @RequestParam("sensor") String sensor,
                                             @RequestParam("date") String date
     ){ //1m, 7d, 30d
-        List<QueryResult.Result> results = new ArrayList<>();
-
+        List<FluxRecord> results = new ArrayList<>();
         results = sensorService.selectDataSensor(kitId, sensor,date);
-
         return new ResponseEntity(results, HttpStatus.OK);
     }
     @GetMapping("/actuator")
@@ -54,3 +54,4 @@ public class SubSensorController {
         return new ResponseEntity("", HttpStatus.OK);
     }
 }
+

@@ -8,14 +8,14 @@ import javax.persistence.Column;
 import java.time.Instant;
 
 @Data
-@Measurement(name = "soilhumidity")
+@Measurement(name = "soilHumidity")
 public class SoilHumidity {
         @TimeColumn
         @Column(name = "time")
         private Instant time;
 
         @Column(name = "value")
-        private String value;
+        private Float value;
 
         @Column(name = "kitid")
         private String kitId;
