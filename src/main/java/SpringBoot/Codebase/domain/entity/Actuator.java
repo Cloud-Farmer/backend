@@ -17,7 +17,7 @@ public class Actuator {
 
     private String sensor;
 
-    private boolean status;
+    private Boolean status;
 
     private LocalDateTime time;
 }

@@ -133,28 +133,32 @@ public class MqttConfiguration {
                 window.setSensor("window");
                 window.setKitId(Long.valueOf(kitId));
                 window.setTime(LocalDateTime.now());
-                window.setStatus(Boolean.valueOf(actuator.get("window").toString()));
+                Long value = (Long) actuator.get(window.getSensor());
+                window.setStatus(value == 1 ? true : false);
                 sensorService.writeActuator(window);
 
                 Actuator pump = new Actuator();
                 pump.setSensor("pump");
                 pump.setKitId(Long.valueOf(kitId));
                 pump.setTime(LocalDateTime.now());
-                pump.setStatus(Boolean.valueOf(actuator.get("pump").toString()));
+                value = (Long) actuator.get(pump.getSensor());
+                pump.setStatus(value == 1 ? true : false);
                 sensorService.writeActuator(pump);
 
                 Actuator led = new Actuator();
                 led.setSensor("led");
                 led.setKitId(Long.valueOf(kitId));
                 led.setTime(LocalDateTime.now());
-                led.setStatus(Boolean.valueOf(actuator.get("led").toString()));
+                value = (Long) actuator.get(led.getSensor());
+                led.setStatus(value == 1 ? true : false);
                 sensorService.writeActuator(led);
 
                 Actuator fan = new Actuator();
                 fan.setSensor("fan");
                 fan.setKitId(Long.valueOf(kitId));
                 fan.setTime(LocalDateTime.now());
-                fan.setStatus(Boolean.valueOf(actuator.get("fan").toString()));
+                value = (Long) actuator.get(fan.getSensor());
+                fan.setStatus(value == 1 ? true : false);
                 sensorService.writeActuator(fan);
             } catch (Exception e) {
                 e.printStackTrace();

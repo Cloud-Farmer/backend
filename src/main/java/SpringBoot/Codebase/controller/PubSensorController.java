@@ -27,6 +27,5 @@ public class PubSensorController {
         // topic kitid/actuator/sensor => data available
         sensorService.sentToMqtt(kitId,sensor,available);
         return new ResponseEntity(temp, HttpStatus.OK);
-
     }
 }

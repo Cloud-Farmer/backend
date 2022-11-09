@@ -73,7 +73,7 @@ public class SensorService {
                     throw new RuntimeException("저장된 액츄에이터 상태가 없습니다");
                 });
 
-        return find.isStatus();
+        return find.getStatus();
     }
 
     public void writeTemperature(Temperature temperature) {
