@@ -14,6 +14,7 @@ import com.influxdb.client.InfluxDBClientFactory;
 import com.influxdb.client.QueryApi;
 import com.influxdb.client.WriteApiBlocking;
 import com.influxdb.client.domain.WritePrecision;
+import com.influxdb.client.write.Point;
 import com.influxdb.query.FluxRecord;
 import com.influxdb.query.FluxTable;
 import org.slf4j.Logger;
@@ -21,9 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
-import com.influxdb.client.write.Point;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -198,9 +197,10 @@ public class SensorService {
         InfluxDBClient influxDBClient = InfluxDBClientFactory.create(url,token,org,bucket);
         WriteApiBlocking writeApi = influxDBClient.getWriteApiBlocking();
         ZonedDateTime time = Instant.now().atZone(ZoneId.of("Asia/Seoul"));
-        String flux = String.format("from(bucket:\"smartfarm\")|> range(start: -%s)" +
+        String flux = String.format("from(bucket:\"smartfarm\")|> range(start: -%s, stop: now())" +
                         " |> filter(fn: (r) => r[\"_measurement\"] == \"%s\")" +
                          "|> filter(fn: (r) => r[\"kitid\"] == \"%s\")" +
+                        "|> aggregateWindow(every: 1h, fn: mean, createEmpty: false)" + // 1h 단위로 묶음
                         "|> yield(name: \"mean\")",
                             date,sensor,kitId);
         List<FluxRecord> records = null;
@@ -210,15 +210,5 @@ public class SensorService {
             records = fluxTable.getRecords();
         }
         return records;
-        //String queryStr = String.format("SELECT * FROM %s where kit_id = '%s' and time > now() - %s", sensor,kitId,date);
-//
-//
-//        Query query = BoundParameterQuery.QueryBuilder.newQuery(queryStr)
-//                .forDatabase("smartfarm")
-//                .create();
-//
-//        QueryResult queryResult = influxDBTemplate.query(query);
-//
-//        return queryResult.getResults();
     }
 }
