@@ -1,5 +1,6 @@
 package SpringBoot.Codebase.controller;
 
+import SpringBoot.Codebase.domain.service.ActuatorService;
 import SpringBoot.Codebase.domain.service.SensorService;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -12,10 +13,10 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @CrossOrigin(origins="*", allowedHeaders = "*")
 public class PubSensorController {
-    private final SensorService sensorService;
+    private final ActuatorService actuatorService;
 
-    public PubSensorController(SensorService sensorService) {
-        this.sensorService = sensorService;
+    public PubSensorController(ActuatorService actuatorService) {
+        this.actuatorService = actuatorService;
     }
 
     @PostMapping("/actuator")
@@ -25,7 +26,8 @@ public class PubSensorController {
                                  @RequestParam("available") String available) {
         String temp = kitId + " " + sensor + " " + available;
         // topic kitid/actuator/sensor => data available
-        sensorService.sentToMqtt(kitId,sensor,available);
+        actuatorService.sentToMqtt(kitId,sensor,available);
+        log.info(temp);
         return new ResponseEntity(temp, HttpStatus.OK);
 
     }

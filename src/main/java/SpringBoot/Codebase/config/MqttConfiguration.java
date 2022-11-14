@@ -1,10 +1,14 @@
 package SpringBoot.Codebase.config;
 
-import SpringBoot.Codebase.domain.entity.Actuator;
+import SpringBoot.Codebase.domain.actuator.Fan;
+import SpringBoot.Codebase.domain.actuator.Led;
+import SpringBoot.Codebase.domain.actuator.Pump;
+import SpringBoot.Codebase.domain.actuator.Window;
 import SpringBoot.Codebase.domain.measurement.Humidity;
 import SpringBoot.Codebase.domain.measurement.Illuminance;
 import SpringBoot.Codebase.domain.measurement.SoilHumidity;
 import SpringBoot.Codebase.domain.measurement.Temperature;
+import SpringBoot.Codebase.domain.service.ActuatorService;
 import SpringBoot.Codebase.domain.service.SensorService;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
@@ -42,15 +46,17 @@ public class MqttConfiguration {
     private final String TOPIC_FILTER;
 
 
+    private final ActuatorService actuatorService;
     private final SensorService sensorService;
 
     @Autowired
     public MqttConfiguration(@Value("${mqtt.url}") String BROKER_URL,
                              @Value("${mqtt.port}") String PORT,
                              @Value("${mqtt.topic}") String TOPIC,
-                             SensorService sensorService) {
+                             ActuatorService actuatorService,SensorService sensorService) {
         this.BROKER_URL = BROKER_URL + ":" + PORT;
         this.TOPIC_FILTER = TOPIC;
+        this.actuatorService = actuatorService;
         this.sensorService = sensorService;
     }
 
@@ -129,33 +135,25 @@ public class MqttConfiguration {
                 soilHumidity.setKitId(kitId);
                 sensorService.writeSoil(soilHumidity);
 
-                Actuator window = new Actuator();
-                window.setSensor("window");
-                window.setKitId(Long.valueOf(kitId));
-                window.setTime(LocalDateTime.now());
-                window.setStatus(Boolean.valueOf(actuator.get("window").toString()));
-                sensorService.writeActuator(window);
+                Window window = new Window();
+                window.setKitId(kitId);
+                window.setStatus(Float.valueOf(actuator.get("window").toString()));
+                actuatorService.writeWindow(window);
 
-                Actuator pump = new Actuator();
-                pump.setSensor("pump");
-                pump.setKitId(Long.valueOf(kitId));
-                pump.setTime(LocalDateTime.now());
-                pump.setStatus(Boolean.valueOf(actuator.get("pump").toString()));
-                sensorService.writeActuator(pump);
+                Led led = new Led();
+                led.setKitId(kitId);
+                led.setStatus(Float.valueOf(actuator.get("led").toString()));
+                actuatorService.writeLed(led);
 
-                Actuator led = new Actuator();
-                led.setSensor("led");
-                led.setKitId(Long.valueOf(kitId));
-                led.setTime(LocalDateTime.now());
-                led.setStatus(Boolean.valueOf(actuator.get("led").toString()));
-                sensorService.writeActuator(led);
+                Pump pump = new Pump();
+                pump.setKitId(kitId);
+                pump.setStatus(Float.valueOf(actuator.get("pump").toString()));
+                actuatorService.writePump(pump);
 
-                Actuator fan = new Actuator();
-                fan.setSensor("fan");
-                fan.setKitId(Long.valueOf(kitId));
-                fan.setTime(LocalDateTime.now());
-                fan.setStatus(Boolean.valueOf(actuator.get("fan").toString()));
-                sensorService.writeActuator(fan);
+                Fan fan = new Fan();
+                fan.setKitId(kitId);
+                fan.setStatus(Float.valueOf(actuator.get("fan").toString()));
+                actuatorService.writeFan(fan);
             } catch (Exception e) {
                 e.printStackTrace();
             }

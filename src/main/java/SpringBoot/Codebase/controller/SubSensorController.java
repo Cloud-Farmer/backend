@@ -1,6 +1,7 @@
 package SpringBoot.Codebase.controller;
 
 
+import SpringBoot.Codebase.domain.service.ActuatorService;
 import SpringBoot.Codebase.domain.service.SensorService;
 import com.influxdb.query.FluxRecord;
 import org.influxdb.dto.QueryResult;
@@ -21,10 +22,12 @@ import java.util.List;
 public class SubSensorController {
 
     private final SensorService sensorService;
+    private final ActuatorService actuatorService;
 
     @Autowired
-    public SubSensorController(SensorService sensorService) {
+    public SubSensorController(SensorService sensorService,ActuatorService actuatorService) {
         this.sensorService = sensorService;
+        this.actuatorService = actuatorService;
     }
 
 
@@ -39,11 +42,12 @@ public class SubSensorController {
     }
     @GetMapping("/actuator")
     public ResponseEntity requestActuatorData(@RequestParam("kit_id") String kitId,
-                                              @RequestParam("sensor") String sensor) {
+                                              @RequestParam("sensor") String sensor,
+                                              @RequestParam("date")String date) {
         try {
-            boolean status = sensorService.receivedToActuator(kitId, sensor);
-
-            return new ResponseEntity(status, HttpStatus.OK);
+            List<FluxRecord> results = new ArrayList<>();
+            results = actuatorService.selectActuator(kitId, sensor, date);
+            return new ResponseEntity(results, HttpStatus.OK);
         } catch (RuntimeException e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.NO_CONTENT);
         }
