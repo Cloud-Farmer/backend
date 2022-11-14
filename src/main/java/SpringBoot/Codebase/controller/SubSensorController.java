@@ -4,6 +4,7 @@ package SpringBoot.Codebase.controller;
 import SpringBoot.Codebase.domain.service.ActuatorService;
 import SpringBoot.Codebase.domain.service.SensorService;
 import com.influxdb.query.FluxRecord;
+import io.swagger.annotations.ApiOperation;
 import org.influxdb.dto.QueryResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,6 +33,7 @@ public class SubSensorController {
 
 
     @GetMapping("/sensor")
+    @ApiOperation("센서 data date 조회")
     public ResponseEntity requestSensorDataWithDate(@RequestParam("kit_id") String kitId,
                                             @RequestParam("sensor") String sensor,
                                             @RequestParam("date") String date
@@ -40,13 +42,27 @@ public class SubSensorController {
         results = sensorService.selectDataSensor(kitId, sensor,date);
         return new ResponseEntity(results, HttpStatus.OK);
     }
-    @GetMapping("/actuator")
+    @GetMapping("/actuators")
+    @ApiOperation("센서 actuator date별 조회")
     public ResponseEntity requestActuatorData(@RequestParam("kit_id") String kitId,
                                               @RequestParam("sensor") String sensor,
                                               @RequestParam("date")String date) {
         try {
             List<FluxRecord> results = new ArrayList<>();
-            results = actuatorService.selectActuator(kitId, sensor, date);
+            results = actuatorService.selectSensorActuator(kitId, sensor, date);
+            return new ResponseEntity(results, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity(e.getMessage(), HttpStatus.NO_CONTENT);
+        }
+    }
+    @GetMapping("/actuator")
+    @ApiOperation("센서 actuator 최신 조회")
+    public ResponseEntity requestActuatorData(@RequestParam("kit_id") String kitId,
+                                              @RequestParam("sensor") String sensor
+                                              ) {
+        try {
+            List<FluxRecord> results = new ArrayList<>();
+            results = actuatorService.selectActuator(kitId, sensor);
             return new ResponseEntity(results, HttpStatus.OK);
         } catch (RuntimeException e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.NO_CONTENT);

@@ -153,7 +153,7 @@ public class ActuatorService {
         }
 
     }
-    public List<FluxRecord> selectActuator(String kitId, String actuator,String date) {
+    public List<FluxRecord> selectSensorActuator(String kitId, String sensor,String date) {
         InfluxDBClient influxDBClient = InfluxDBClientFactory.create(url,token,org,bucket);
         WriteApiBlocking writeApi = influxDBClient.getWriteApiBlocking();
         ZonedDateTime time = Instant.now().atZone(ZoneId.of("Asia/Seoul"));
@@ -162,7 +162,25 @@ public class ActuatorService {
                         "|> filter(fn: (r) => r[\"kitid\"] == \"%s\")" +
                         "|> aggregateWindow(every: 1h, fn: mean, createEmpty: false)" + // 1h 단위로 묶음
                         "|> yield(name: \"mean\")",
-                date,actuator,kitId);
+                date,sensor,kitId);
+        List<FluxRecord> records = null;
+        QueryApi queryApi = influxDBClient.getQueryApi();
+        List<FluxTable> tables = queryApi.query(flux);
+        for (FluxTable fluxTable : tables) {
+            records = fluxTable.getRecords();
+        }
+        return records;
+    }
+    public List<FluxRecord> selectActuator(String kitId, String sensor) {
+        InfluxDBClient influxDBClient = InfluxDBClientFactory.create(url,token,org,bucket);
+        WriteApiBlocking writeApi = influxDBClient.getWriteApiBlocking();
+        ZonedDateTime time = Instant.now().atZone(ZoneId.of("Asia/Seoul"));
+        String flux = String.format("from(bucket:\"smartfarm\")|> range(start:-1m)" +
+                        " |> filter(fn: (r) => r[\"_measurement\"] == \"%s\")" +
+                        "|> filter(fn: (r) => r[\"kitid\"] == \"%s\")" +
+                        "|> aggregateWindow(every: 1h, fn: last, createEmpty: false)" +
+                        "|> last()",
+                sensor,kitId);
         List<FluxRecord> records = null;
         QueryApi queryApi = influxDBClient.getQueryApi();
         List<FluxTable> tables = queryApi.query(flux);

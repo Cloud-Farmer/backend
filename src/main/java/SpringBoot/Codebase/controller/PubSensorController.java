@@ -24,11 +24,19 @@ public class PubSensorController {
     public ResponseEntity sensor(@RequestParam("kitid") String kitId,
                                  @RequestParam("sensor") String sensor,
                                  @RequestParam("available") String available) {
-        String temp = kitId + " " + sensor + " " + available;
+
         // topic kitid/actuator/sensor => data available
         actuatorService.sentToMqtt(kitId,sensor,available);
-        log.info(temp);
-        return new ResponseEntity(temp, HttpStatus.OK);
-
+        if (available.equals("1")){
+            log.info(kitId+" 번 키트의 "+sensor+" 센서가 켜졌습니다.");
+            return new ResponseEntity(kitId+" 번 키트의 "+sensor+" 센서가 켜졌습니다.", HttpStatus.OK);
+        }
+        else if(available.equals("0")){
+            log.info(kitId+" 번 키트의 "+sensor+" 센서가 꺼졌습니다.");
+            return new ResponseEntity(kitId+" 번 키트의 "+sensor+" 센서가 꺼졌습니다.", HttpStatus.OK);
+        }
+        else
+            log.info("잘못된 조회입니다.");
+            return new ResponseEntity("잘못된 조회입니다.", HttpStatus.BAD_REQUEST);
     }
 }
