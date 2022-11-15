@@ -6,6 +6,7 @@ import SpringBoot.Codebase.domain.measurement.Illuminance;
 import SpringBoot.Codebase.domain.measurement.SoilHumidity;
 import SpringBoot.Codebase.domain.measurement.Temperature;
 import SpringBoot.Codebase.domain.service.SensorService;
+import SpringBoot.Codebase.util.AlertManager;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -44,11 +45,14 @@ public class MqttConfiguration {
 
     private final SensorService sensorService;
 
+    private final AlertManager alertManager;
+
     @Autowired
     public MqttConfiguration(@Value("${mqtt.url}") String BROKER_URL,
                              @Value("${mqtt.port}") String PORT,
                              @Value("${mqtt.topic}") String TOPIC,
-                             SensorService sensorService) {
+                             SensorService sensorService, AlertManager alertManager) {
+        this.alertManager = alertManager;
         this.BROKER_URL = BROKER_URL + ":" + PORT;
         this.TOPIC_FILTER = TOPIC;
         this.sensorService = sensorService;
@@ -128,6 +132,11 @@ public class MqttConfiguration {
                 soilHumidity.setValue(Float.valueOf(sensor.get("soilhumidity").toString()));
                 soilHumidity.setKitId(kitId);
                 sensorService.writeSoil(soilHumidity);
+
+                alertManager.run(temperature);
+                alertManager.run(illuminance);
+                alertManager.run(humidity);
+                alertManager.run(soilHumidity);
 
                 Actuator window = new Actuator();
                 window.setSensor("window");
