@@ -1,22 +1,33 @@
 package SpringBoot.Codebase.domain.entity;
 
-import javax.persistence.*;
+import lombok.*;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 
 @Entity
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class SmartFarm { // 회원 FK, 농장주
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "smartfarm_id")
     private Long id;
 
-    private String sensors;
+    private String temperatureCondition;
+    private Integer temperatureConditionValue;
 
-    private String condition1;
+    private String soilHumidityCondition;
+    private Integer soilHumidityConditionValue;
 
-    private String condition2;
+    private String illuminanceCondition;
+    private Integer illuminanceConditionValue;
 
-    private String condition3;
-
-    private String condition4;
+    private String humidityCondition;
+    private Integer humidityConditionValue;
 
 }

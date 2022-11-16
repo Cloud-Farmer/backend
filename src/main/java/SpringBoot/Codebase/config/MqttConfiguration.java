@@ -4,10 +4,12 @@ import SpringBoot.Codebase.domain.actuator.Fan;
 import SpringBoot.Codebase.domain.actuator.Led;
 import SpringBoot.Codebase.domain.actuator.Pump;
 import SpringBoot.Codebase.domain.actuator.Window;
+import SpringBoot.Codebase.domain.entity.SmartFarm;
 import SpringBoot.Codebase.domain.measurement.Humidity;
 import SpringBoot.Codebase.domain.measurement.Illuminance;
 import SpringBoot.Codebase.domain.measurement.SoilHumidity;
 import SpringBoot.Codebase.domain.measurement.Temperature;
+import SpringBoot.Codebase.domain.repository.SmartFarmRepository;
 import SpringBoot.Codebase.domain.service.ActuatorService;
 import SpringBoot.Codebase.domain.service.SensorService;
 import SpringBoot.Codebase.util.AlertManager;
@@ -47,15 +49,17 @@ public class MqttConfiguration {
 
     private final ActuatorService actuatorService;
     private final SensorService sensorService;
-
     private final AlertManager alertManager;
+
+    private final SmartFarmRepository smartFarmRepository;
 
     @Autowired
     public MqttConfiguration(@Value("${mqtt.url}") String BROKER_URL,
                              @Value("${mqtt.port}") String PORT,
                              @Value("${mqtt.topic}") String TOPIC,
-                             ActuatorService actuatorService, SensorService sensorService, AlertManager alertManager) {
+                             ActuatorService actuatorService, SensorService sensorService, AlertManager alertManager, SmartFarmRepository smartFarmRepository) {
         this.alertManager = alertManager;
+        this.smartFarmRepository = smartFarmRepository;
         this.BROKER_URL = BROKER_URL + ":" + PORT;
         this.TOPIC_FILTER = TOPIC;
         this.actuatorService = actuatorService;
@@ -137,10 +141,13 @@ public class MqttConfiguration {
                 soilHumidity.setKitId(kitId);
                 sensorService.writeSoil(soilHumidity);
 
-                alertManager.run(temperature);
-                alertManager.run(illuminance);
-                alertManager.run(humidity);
-                alertManager.run(soilHumidity);
+                SmartFarm farm = smartFarmRepository.findById(Long.valueOf(kitId))
+                        .orElse(null);
+
+                alertManager.run(farm,temperature);
+                alertManager.run(farm,illuminance);
+                alertManager.run(farm,humidity);
+                alertManager.run(farm,soilHumidity);
 
                 Window window = new Window();
                 window.setKitId(kitId);

@@ -171,6 +171,7 @@ public class ActuatorService {
         }
         return records;
     }
+
     public List<FluxRecord> selectActuator(String kitId, String sensor) {
         InfluxDBClient influxDBClient = InfluxDBClientFactory.create(url,token,org,bucket);
         WriteApiBlocking writeApi = influxDBClient.getWriteApiBlocking();

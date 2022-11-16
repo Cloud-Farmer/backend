@@ -9,7 +9,7 @@ import java.time.Instant;
 
 @Data
 @Measurement(name = "fan")
-public class Fan implements Actuator {
+public class Fan {
 
     @TimeColumn
     @Column(name = "time")

@@ -1,5 +1,8 @@
 package SpringBoot.Codebase.util.chain;
 
+import SpringBoot.Codebase.domain.entity.SmartFarm;
+import SpringBoot.Codebase.domain.repository.AlertRepository;
+
 public class SoilHumidityChain implements AlertChain {
 
     private AlertChain alertChain;
@@ -10,11 +13,11 @@ public class SoilHumidityChain implements AlertChain {
     }
 
     @Override
-    public void process(Object object) {
+    public void process(SmartFarm farm, Object object, AlertRepository alertRepository) {
         if (object instanceof SoilHumidityChain) {
             SoilHumidityChain soilHumidity = (SoilHumidityChain) object;
             //
         }
-        alertChain.process(object);
+        alertChain.process(farm, object, alertRepository);
     }
 }

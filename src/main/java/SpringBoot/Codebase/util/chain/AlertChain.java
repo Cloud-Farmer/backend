@@ -1,8 +1,10 @@
 package SpringBoot.Codebase.util.chain;
 
-import lombok.extern.slf4j.Slf4j;
+import SpringBoot.Codebase.domain.entity.SmartFarm;
+import SpringBoot.Codebase.domain.repository.AlertRepository;
+
 public interface AlertChain {
     public void setNext(AlertChain nextChain);
-    public void process(Object object);
+    public void process(SmartFarm farm, Object object, AlertRepository alertRepository);
 
 }
