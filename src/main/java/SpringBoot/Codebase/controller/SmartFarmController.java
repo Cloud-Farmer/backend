@@ -19,12 +19,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.dsl.StandardIntegrationFlow;
 import org.springframework.integration.dsl.context.IntegrationFlowContext;
+import org.springframework.integration.dsl.context.IntegrationFlowContext.IntegrationFlowRegistration;
 import org.springframework.integration.mqtt.inbound.MqttPahoMessageDrivenChannelAdapter;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/kit")
@@ -47,16 +49,17 @@ public class SmartFarmController {
 
     @Value("${mqtt.url}")
     String BROKER_URL;
-    private IntegrationFlowContext.IntegrationFlowRegistration addAdapter(String... topics) {
+    private IntegrationFlowRegistration addAdapter(String... topics) {
         MqttPahoMessageDrivenChannelAdapter adapter = new MqttPahoMessageDrivenChannelAdapter(BROKER_URL, MqttAsyncClient.generateClientId(), topics);
         StandardIntegrationFlow flow = IntegrationFlows.from(adapter)
                 .channel(mqttInputChannel)
                 .get();
+        System.out.println(" = " + flowContext.getRegistry());
         return this.flowContext.registration(flow).register();
     }
 
-    private void removeAdapter(String id) {
-        this.flowContext.remove(id);    // 어댑터 삭제
+    private void removeAdapter(String mqttId) {
+        this.flowContext.remove(mqttId);    // 어댑터 삭제
     }
 
     @PostMapping("/new")
@@ -64,11 +67,12 @@ public class SmartFarmController {
     public ResponseEntity newKit(@RequestParam String kitId) {
         // 등록시 condition을 기본값으로
             // id a5423b DB 저장하고
-        IntegrationFlowContext.IntegrationFlowRegistration registration = addAdapter(kitId+"/json");
+        IntegrationFlowRegistration registration = addAdapter(kitId+"/json");
         String id = registration.getId();
         SmartFarm smartFarm = new SmartFarm();
+        smartFarm.setId(4L);
         smartFarm.setMqttAdapterId(kitId);
-        smartFarm.setSoilHumidityConditionValue(100);
+        smartFarm.setHumidityConditionValue(100);
         smartFarm.setIlluminanceConditionValue(100);
         smartFarm.setSoilHumidityConditionValue(100);
         smartFarm.setTemperatureConditionValue(100);
@@ -83,9 +87,9 @@ public class SmartFarmController {
                 .orElseThrow(()->{
                     throw new RuntimeException("KitId가 존재하지 않음");
         });
-
-        removeAdapter(smartFarm.getMqttAdapterId());
+        int s = Integer.parseInt(smartFarm.getMqttAdapterId());
         // SmratFarm DB 데이터도 삭제
+        removeAdapter("org.springframework.integration.dsl.StandardIntegrationFlow#"+String.valueOf(s-1));
         return new ResponseEntity("키트 삭제", HttpStatus.OK);
     }
 
