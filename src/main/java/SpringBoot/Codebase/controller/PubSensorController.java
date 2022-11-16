@@ -1,5 +1,6 @@
 package SpringBoot.Codebase.controller;
 
+import SpringBoot.Codebase.domain.service.ActuatorService;
 import SpringBoot.Codebase.domain.service.SensorService;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -12,10 +13,10 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @CrossOrigin(origins="*", allowedHeaders = "*")
 public class PubSensorController {
-    private final SensorService sensorService;
+    private final ActuatorService actuatorService;
 
-    public PubSensorController(SensorService sensorService) {
-        this.sensorService = sensorService;
+    public PubSensorController(ActuatorService actuatorService) {
+        this.actuatorService = actuatorService;
     }
 
     @PostMapping("/actuator")
@@ -23,9 +24,19 @@ public class PubSensorController {
     public ResponseEntity sensor(@RequestParam("kitid") String kitId,
                                  @RequestParam("sensor") String sensor,
                                  @RequestParam("available") String available) {
-        String temp = kitId + " " + sensor + " " + available;
+
         // topic kitid/actuator/sensor => data available
-        sensorService.sentToMqtt(kitId,sensor,available);
-        return new ResponseEntity(temp, HttpStatus.OK);
+        actuatorService.sentToMqtt(kitId,sensor,available);
+        if (available.equals("1")){
+            log.info(kitId+" 번 키트의 "+sensor+" 센서가 켜졌습니다.");
+            return new ResponseEntity(kitId+" 번 키트의 "+sensor+" 센서가 켜졌습니다.", HttpStatus.OK);
+        }
+        else if(available.equals("0")){
+            log.info(kitId+" 번 키트의 "+sensor+" 센서가 꺼졌습니다.");
+            return new ResponseEntity(kitId+" 번 키트의 "+sensor+" 센서가 꺼졌습니다.", HttpStatus.OK);
+        }
+        else
+            log.info("잘못된 조회입니다.");
+            return new ResponseEntity("잘못된 조회입니다.", HttpStatus.BAD_REQUEST);
     }
 }

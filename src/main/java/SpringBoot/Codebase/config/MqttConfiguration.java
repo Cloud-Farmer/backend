@@ -5,6 +5,7 @@ import SpringBoot.Codebase.domain.measurement.Humidity;
 import SpringBoot.Codebase.domain.measurement.Illuminance;
 import SpringBoot.Codebase.domain.measurement.SoilHumidity;
 import SpringBoot.Codebase.domain.measurement.Temperature;
+import SpringBoot.Codebase.domain.service.ActuatorService;
 import SpringBoot.Codebase.domain.service.SensorService;
 import SpringBoot.Codebase.util.AlertManager;
 import lombok.extern.slf4j.Slf4j;
@@ -43,6 +44,7 @@ public class MqttConfiguration {
     private final String TOPIC_FILTER;
 
 
+    private final ActuatorService actuatorService;
     private final SensorService sensorService;
 
     private final AlertManager alertManager;
@@ -51,10 +53,11 @@ public class MqttConfiguration {
     public MqttConfiguration(@Value("${mqtt.url}") String BROKER_URL,
                              @Value("${mqtt.port}") String PORT,
                              @Value("${mqtt.topic}") String TOPIC,
-                             SensorService sensorService, AlertManager alertManager) {
+                             ActuatorService actuatorService, SensorService sensorService, AlertManager alertManager) {
         this.alertManager = alertManager;
         this.BROKER_URL = BROKER_URL + ":" + PORT;
         this.TOPIC_FILTER = TOPIC;
+        this.actuatorService = actuatorService;
         this.sensorService = sensorService;
     }
 
