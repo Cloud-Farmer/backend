@@ -19,7 +19,7 @@ public class AlertResponseDto {
 
     private String language; // 언어
 
-    @JsonFormat
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime alertedTime;  // 시각
 
     public static AlertResponseDto of(Alert alert) {

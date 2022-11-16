@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   backend:
-    image: smartfarm-backend:0.0.1
+    image: smartfarm-backend:0.0.5
     ports:
       - "18081:8080"
     restart: always
@@ -11,11 +11,9 @@ services:
       SPRING_DATASOURCE_PASSWORD: "mega123"
 
   influxdb:
-    container_name: influxdb
     image: influxdb:2.2-alpine
     ports:
       - "8086:8086"
-    hostname: influxdb
     environment:
       - DOCKER_INFLUXDB_INIT_MODE=setup
       - DOCKER_INFLUXDB_INIT_USERNAME=mega
