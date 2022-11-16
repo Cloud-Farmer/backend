@@ -93,7 +93,7 @@ public class MqttConfiguration {
     }
 
     @Bean
-    public MessageProducer inboundChannel() {
+    public MessageProducer inboundChannel() { // 한번만
         MqttPahoMessageDrivenChannelAdapter adapter =
                 new MqttPahoMessageDrivenChannelAdapter(BROKER_URL, MQTT_SUB_CLIENT_ID, TOPIC_FILTER, "1/json", "2/json");   // 동적으로 구독 토픽 생성하기
         adapter.setCompletionTimeout(5000);

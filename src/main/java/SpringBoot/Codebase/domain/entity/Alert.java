@@ -26,9 +26,9 @@ public class Alert {
 
     private String language; // 언어
 
-    private LocalDateTime alertedTime;
+    private LocalDateTime alertedTime;  // 시각
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "smartfarm_id")
     private SmartFarm smartFarm;
 }
