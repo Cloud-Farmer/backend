@@ -17,7 +17,7 @@ public class TempertureChain implements AlertChain {
     public void process(Object object) {
         if (object instanceof Temperature) {
             Temperature temperature = (Temperature) object;
-            if (temperature.getValue() >= 10) { // TODO : 스마트팜 관리자가 설정하는 트리거로 알람을 지정해야함
+            if (temperature.getValue() >= 25) { // TODO : 스마트팜 관리자가 설정하는 트리거로 알람을 지정해야함
                 log.info(String.format("%s 키트의 온도가 높습니다", temperature.getKitId()));
                 log.info(String.format("%s kit temperture is high", temperature.getKitId()));
 

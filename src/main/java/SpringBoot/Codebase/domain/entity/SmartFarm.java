@@ -1,9 +1,6 @@
 package SpringBoot.Codebase.domain.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 public class SmartFarm { // 회원 FK, 농장주
@@ -14,5 +11,12 @@ public class SmartFarm { // 회원 FK, 농장주
 
     private String sensors;
 
-    //
+    private String condition1;
+
+    private String condition2;
+
+    private String condition3;
+
+    private String condition4;
+
 }
