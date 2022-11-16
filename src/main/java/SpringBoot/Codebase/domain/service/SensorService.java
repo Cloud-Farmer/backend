@@ -1,7 +1,6 @@
 package SpringBoot.Codebase.domain.service;
 
 
-
 import SpringBoot.Codebase.domain.measurement.Humidity;
 import SpringBoot.Codebase.domain.measurement.Illuminance;
 import SpringBoot.Codebase.domain.measurement.SoilHumidity;
@@ -14,9 +13,7 @@ import com.influxdb.client.domain.WritePrecision;
 import com.influxdb.client.write.Point;
 import com.influxdb.query.FluxRecord;
 import com.influxdb.query.FluxTable;
-
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
