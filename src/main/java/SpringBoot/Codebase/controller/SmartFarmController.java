@@ -55,14 +55,27 @@ public class SmartFarmController {
         return this.flowContext.registration(flow).register();
     }
 
+    private void removeAdapter(String id) {
+        this.flowContext.remove(id);    // 어댑터 삭제
+    }
+
     @PostMapping("/new")
     public ResponseEntity newKit() {
         // 등록시 condition을 기본값으로
             // id a5423b DB 저장하고
 
-        addAdapter("3/#");
+        IntegrationFlowContext.IntegrationFlowRegistration registration = addAdapter("3/#");
+        String id = registration.getId();
 
         return new ResponseEntity("키트 등록완료", HttpStatus.OK);
+    }
+
+    @DeleteMapping("/delete") // TODO : KIT ID를 받아야함
+    public ResponseEntity deleteKit() {
+
+        removeAdapter("org.springframework.integration.dsl.StandardIntegrationFlow#0");
+        // SmratFarm DB 데이터도 삭제
+        return new ResponseEntity("키트 삭제", HttpStatus.OK);
     }
 
     @GetMapping("/{kit_id}")
