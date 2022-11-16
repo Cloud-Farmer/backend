@@ -8,12 +8,19 @@ import SpringBoot.Codebase.domain.entity.dto.AlertResponseDto;
 import SpringBoot.Codebase.domain.repository.AlertRepository;
 import SpringBoot.Codebase.domain.repository.SmartFarmRepository;
 import io.swagger.annotations.ApiOperation;
+import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.integration.dsl.IntegrationFlows;
+import org.springframework.integration.dsl.StandardIntegrationFlow;
+import org.springframework.integration.dsl.context.IntegrationFlowContext;
+import org.springframework.integration.mqtt.inbound.MqttPahoMessageDrivenChannelAdapter;
+import org.springframework.messaging.MessageChannel;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -32,10 +39,29 @@ public class SmartFarmController {
     @Autowired
     private MqttConfiguration.MqttOrderGateway mqttOrderGateway;
 
+    @Autowired
+    private IntegrationFlowContext flowContext;
+
+    @Autowired
+    private MessageChannel mqttInputChannel;
+
+    @Value("${mqtt.url}")
+    String BROKER_URL;
+    private IntegrationFlowContext.IntegrationFlowRegistration addAdapter(String... topics) {
+        MqttPahoMessageDrivenChannelAdapter adapter = new MqttPahoMessageDrivenChannelAdapter(BROKER_URL, MqttAsyncClient.generateClientId(), topics);
+        StandardIntegrationFlow flow = IntegrationFlows.from(adapter)
+                .channel(mqttInputChannel)
+                .get();
+        return this.flowContext.registration(flow).register();
+    }
+
     @PostMapping("/new")
     public ResponseEntity newKit() {
         // 등록시 condition을 기본값으로
             // id a5423b DB 저장하고
+
+        addAdapter("3/#");
+
         return new ResponseEntity("키트 등록완료", HttpStatus.OK);
     }
 
