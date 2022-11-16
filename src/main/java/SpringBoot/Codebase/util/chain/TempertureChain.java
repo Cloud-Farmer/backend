@@ -23,11 +23,11 @@ public class TempertureChain implements AlertChain {
         if (object instanceof Temperature) {
             Temperature temperature = (Temperature) object;
             if (temperature.getValue() >= farm.getTemperatureConditionValue()) { // TODO : 스마트팜 관리자가 설정하는 트리거로 알람을 지정해야함
-                log.info(String.format("%s 키트의 온도가 %d 보다 높습니다", temperature.getKitId(), farm.getTemperatureConditionValue()));
+                String message = String.format("%s 키트의 온도 %d 보다 높습니다", temperature.getKitId(), farm.getTemperatureConditionValue());
 
                 Alert alert = Alert.builder()
                         .language("kr")
-                        .message(String.format("%s 키트의 온도가 %d 보다 높습니다", temperature.getKitId(), farm.getTemperatureConditionValue()))
+                        .message(message)
                         .status("warning")
                         .subject("temperature")
                         .smartFarm(farm)
