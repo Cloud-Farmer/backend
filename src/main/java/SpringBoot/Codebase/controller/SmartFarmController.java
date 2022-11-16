@@ -60,20 +60,31 @@ public class SmartFarmController {
     }
 
     @PostMapping("/new")
-    public ResponseEntity newKit() {
+    @ApiOperation("kit 동적 생성 ")
+    public ResponseEntity newKit(@RequestParam String kitId) {
         // 등록시 condition을 기본값으로
             // id a5423b DB 저장하고
-
-        IntegrationFlowContext.IntegrationFlowRegistration registration = addAdapter("3/#");
+        IntegrationFlowContext.IntegrationFlowRegistration registration = addAdapter(kitId+"/json");
         String id = registration.getId();
-
+        SmartFarm smartFarm = new SmartFarm();
+        smartFarm.setMqttAdapterId(kitId);
+        smartFarm.setSoilHumidityConditionValue(100);
+        smartFarm.setIlluminanceConditionValue(100);
+        smartFarm.setSoilHumidityConditionValue(100);
+        smartFarm.setTemperatureConditionValue(100);
+        smartFarmRepository.save(smartFarm);
         return new ResponseEntity("키트 등록완료", HttpStatus.OK);
     }
 
     @DeleteMapping("/delete") // TODO : KIT ID를 받아야함
-    public ResponseEntity deleteKit() {
+    @ApiOperation("kid delete")
+    public ResponseEntity deleteKit(@RequestParam String kitId) {
+        SmartFarm smartFarm = smartFarmRepository.findByMqttAdapterId(kitId)
+                .orElseThrow(()->{
+                    throw new RuntimeException("KitId가 존재하지 않음");
+        });
 
-        removeAdapter("org.springframework.integration.dsl.StandardIntegrationFlow#0");
+        removeAdapter(smartFarm.getMqttAdapterId());
         // SmratFarm DB 데이터도 삭제
         return new ResponseEntity("키트 삭제", HttpStatus.OK);
     }
