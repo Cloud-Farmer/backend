@@ -1,5 +1,6 @@
 package SpringBoot.Codebase.controller;
 
+import SpringBoot.Codebase.config.MqttConfiguration;
 import SpringBoot.Codebase.domain.entity.Alert;
 import SpringBoot.Codebase.domain.entity.SmartFarm;
 import SpringBoot.Codebase.domain.entity.dto.AlertListDto;
@@ -28,6 +29,9 @@ public class SmartFarmController {
     @Autowired
     private AlertRepository alertRepository;
 
+    @Autowired
+    private MqttConfiguration.MqttOrderGateway mqttOrderGateway;
+
     @PostMapping("/new")
     public ResponseEntity newKit() {
         // 등록시 condition을 기본값으로
@@ -55,19 +59,29 @@ public class SmartFarmController {
                 .orElseThrow(() -> {
                     throw new RuntimeException("존재하지 않는 KIT");
                 });
-
+        boolean typeCheck = false;
         if (type.equals("temperature")) {
             kit.setTemperatureConditionValue(value);
+            typeCheck = true;
         } else if (type.equals("soilhumidity")) {
             kit.setSoilHumidityConditionValue(value);
+            typeCheck = true;
+
         } else if (type.equals("illuminance")) {
             kit.setIlluminanceConditionValue(value);
+            typeCheck = true;
+
         } else if (type.equals("humidity")) {
             kit.setHumidityConditionValue(value);
+            typeCheck = true;
         }
-        smartFarmRepository.save(kit);
 
-        return new ResponseEntity("", HttpStatus.OK);
+        if (typeCheck) {
+            smartFarmRepository.save(kit);
+            sentToMqtt(kitID, type, value);
+        }
+
+        return new ResponseEntity(type + ":" + value + " 으로 지정됨", HttpStatus.OK);
     }
 
     @GetMapping("/alert/{kit_id}")
@@ -90,5 +104,10 @@ public class SmartFarmController {
         listDto.setTotalPages(alerts.getTotalPages());
 
         return new ResponseEntity(listDto, HttpStatus.OK);
+    }
+
+    public void sentToMqtt(Long kitId, String alertType, int value) {
+        String topic = kitId + "/alertvalue/" + alertType;
+        mqttOrderGateway.sendToMqtt(String.valueOf(value), topic);
     }
 }

@@ -47,7 +47,6 @@ public class ActuatorService {
     public void sentToMqtt(String kitId, String sensor, String available) {
         String topic = kitId + "/actuator/" + sensor;
         mqttOrderGateway.sendToMqtt(available, topic);
-
     }
     public void writeFan(Fan fan){
 
