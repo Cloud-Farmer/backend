@@ -1,15 +1,13 @@
 package SpringBoot.Codebase.config;
 
-import SpringBoot.Codebase.domain.actuator.Fan;
-import SpringBoot.Codebase.domain.actuator.Led;
-import SpringBoot.Codebase.domain.actuator.Pump;
-import SpringBoot.Codebase.domain.actuator.Window;
+import SpringBoot.Codebase.domain.entity.Actuator;
 import SpringBoot.Codebase.domain.measurement.Humidity;
 import SpringBoot.Codebase.domain.measurement.Illuminance;
 import SpringBoot.Codebase.domain.measurement.SoilHumidity;
 import SpringBoot.Codebase.domain.measurement.Temperature;
 import SpringBoot.Codebase.domain.service.ActuatorService;
 import SpringBoot.Codebase.domain.service.SensorService;
+import SpringBoot.Codebase.util.AlertManager;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -49,11 +47,14 @@ public class MqttConfiguration {
     private final ActuatorService actuatorService;
     private final SensorService sensorService;
 
+    private final AlertManager alertManager;
+
     @Autowired
     public MqttConfiguration(@Value("${mqtt.url}") String BROKER_URL,
                              @Value("${mqtt.port}") String PORT,
                              @Value("${mqtt.topic}") String TOPIC,
-                             ActuatorService actuatorService,SensorService sensorService) {
+                             ActuatorService actuatorService, SensorService sensorService, AlertManager alertManager) {
+        this.alertManager = alertManager;
         this.BROKER_URL = BROKER_URL + ":" + PORT;
         this.TOPIC_FILTER = TOPIC;
         this.actuatorService = actuatorService;
@@ -135,25 +136,42 @@ public class MqttConfiguration {
                 soilHumidity.setKitId(kitId);
                 sensorService.writeSoil(soilHumidity);
 
-                Window window = new Window();
-                window.setKitId(kitId);
-                window.setStatus(Float.valueOf(actuator.get("window").toString()));
-                actuatorService.writeWindow(window);
+                alertManager.run(temperature);
+                alertManager.run(illuminance);
+                alertManager.run(humidity);
+                alertManager.run(soilHumidity);
 
-                Led led = new Led();
-                led.setKitId(kitId);
-                led.setStatus(Float.valueOf(actuator.get("led").toString()));
-                actuatorService.writeLed(led);
+                Actuator window = new Actuator();
+                window.setSensor("window");
+                window.setKitId(Long.valueOf(kitId));
+                window.setTime(LocalDateTime.now());
+                Long value = (Long) actuator.get(window.getSensor());
+                window.setStatus(value == 1 ? true : false);
+                sensorService.writeActuator(window);
 
-                Pump pump = new Pump();
-                pump.setKitId(kitId);
-                pump.setStatus(Float.valueOf(actuator.get("pump").toString()));
-                actuatorService.writePump(pump);
+                Actuator pump = new Actuator();
+                pump.setSensor("pump");
+                pump.setKitId(Long.valueOf(kitId));
+                pump.setTime(LocalDateTime.now());
+                value = (Long) actuator.get(pump.getSensor());
+                pump.setStatus(value == 1 ? true : false);
+                sensorService.writeActuator(pump);
 
-                Fan fan = new Fan();
-                fan.setKitId(kitId);
-                fan.setStatus(Float.valueOf(actuator.get("fan").toString()));
-                actuatorService.writeFan(fan);
+                Actuator led = new Actuator();
+                led.setSensor("led");
+                led.setKitId(Long.valueOf(kitId));
+                led.setTime(LocalDateTime.now());
+                value = (Long) actuator.get(led.getSensor());
+                led.setStatus(value == 1 ? true : false);
+                sensorService.writeActuator(led);
+
+                Actuator fan = new Actuator();
+                fan.setSensor("fan");
+                fan.setKitId(Long.valueOf(kitId));
+                fan.setTime(LocalDateTime.now());
+                value = (Long) actuator.get(fan.getSensor());
+                fan.setStatus(value == 1 ? true : false);
+                sensorService.writeActuator(fan);
             } catch (Exception e) {
                 e.printStackTrace();
             }
