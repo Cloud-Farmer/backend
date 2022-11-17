@@ -104,7 +104,7 @@ public class SmartFarmController {
                         throw new RuntimeException("해당 키트가 존재하지 않습니다");
                     });
 
-            if (smartFarm.getMqttAdapterId() != null) {
+            if (!smartFarm.getMqttAdapterId().equals("adapter control by server")) {
                 removeAdapter(smartFarm.getMqttAdapterId());
             }
 
