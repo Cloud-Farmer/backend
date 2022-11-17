@@ -23,7 +23,7 @@ public class SoilHumidityChain implements AlertChain {
         if (object instanceof SoilHumidity) {
             SoilHumidity soilHumidity = (SoilHumidity) object;
             if (soilHumidity.getValue() >= farm.getHumidityConditionValue()) {
-                String message = String.format("%s 키트의 토양습도 %d 보다 높습니다", soilHumidity.getKitId(), farm.getSoilHumidityConditionValue());
+                String message = String.format("ID %s 키트의 토양습도가 %d 보다 높습니다", soilHumidity.getKitId(), farm.getSoilHumidityConditionValue());
 
                 Alert alert = Alert.builder()
                         .language("kr")

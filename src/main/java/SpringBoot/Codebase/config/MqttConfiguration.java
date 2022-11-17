@@ -36,6 +36,8 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHandler;
 import org.springframework.messaging.handler.annotation.Header;
 
+import java.util.List;
+
 @Slf4j
 @Configuration
 @IntegrationComponentScan
@@ -99,6 +101,16 @@ public class MqttConfiguration {
         adapter.setConverter(new DefaultPahoMessageConverter());
         adapter.setQos(1);
         adapter.setOutputChannel(mqttInputChannel());
+
+        // DB에 저장된 키트 불러옴
+        List<SmartFarm> farms = smartFarmRepository.findAll();
+        for (SmartFarm smartFarm : farms) {
+            String topic = smartFarm.getId() + "/json";
+            adapter.addTopic(topic, 1);
+            smartFarm.setMqttAdapterId("adapter control by server");
+        }
+        smartFarmRepository.saveAll(farms);
+
         return adapter;
     }
 

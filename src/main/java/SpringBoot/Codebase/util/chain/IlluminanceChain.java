@@ -21,7 +21,7 @@ public class  IlluminanceChain implements AlertChain {
         if (object instanceof Illuminance) {
             Illuminance illuminance = (Illuminance) object;
             if (illuminance.getValue() >= farm.getIlluminanceConditionValue()) {
-                String message = String.format("%s 키트의 조도 %d 보다 높습니다", illuminance.getKitId(), farm.getIlluminanceConditionValue());
+                String message = String.format("ID %s 키트의 조도가 %d 보다 높습니다", illuminance.getKitId(), farm.getIlluminanceConditionValue());
 
                 Alert alert = Alert.builder()
                         .language("kr")

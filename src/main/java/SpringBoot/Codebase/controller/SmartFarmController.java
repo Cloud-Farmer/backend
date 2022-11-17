@@ -24,8 +24,10 @@ import org.springframework.integration.mqtt.inbound.MqttPahoMessageDrivenChannel
 import org.springframework.messaging.MessageChannel;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/kit")
@@ -70,6 +72,10 @@ public class SmartFarmController {
     @ApiOperation("kit 동적 생성 ")
     public ResponseEntity newKit(@RequestParam String kitId) {
         try {
+            Optional<SmartFarm> farm = smartFarmRepository.findById(Long.valueOf(kitId));
+            if(farm.isPresent()){
+                throw new RuntimeException("이미 추가된 KIT 입니다");
+            }
 
             SmartFarm smartFarm = new SmartFarm();
             smartFarm.setId(Long.valueOf(kitId));
@@ -77,6 +83,7 @@ public class SmartFarmController {
             smartFarm.setIlluminanceConditionValue(100);
             smartFarm.setSoilHumidityConditionValue(100);
             smartFarm.setTemperatureConditionValue(100);
+            smartFarm.setCreatedTime(LocalDateTime.now());
 
             IntegrationFlowRegistration registration = addAdapter(kitId + "/json");
             smartFarm.setMqttAdapterId(registration.getId());

@@ -3,6 +3,7 @@ package SpringBoot.Codebase.domain.entity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +34,8 @@ public class SmartFarm { // 회원 FK, 농장주
 
     @Column(nullable = false)
     private String mqttAdapterId;
+
+    private LocalDateTime createdTime;
 
     @OneToMany(mappedBy = "smartFarm", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Alert> alerts = new ArrayList<>();
