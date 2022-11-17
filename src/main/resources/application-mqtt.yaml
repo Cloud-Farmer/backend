@@ -2,5 +2,5 @@ mqtt:
   url: tcp://203.241.228.51
   port: 1883
   qos: 1
-  topic: "CloudFarm1/sensor/#"
+  topic: "ping"
 

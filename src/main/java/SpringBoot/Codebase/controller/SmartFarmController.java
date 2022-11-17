@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/kit")
@@ -56,87 +55,104 @@ public class SmartFarmController {
                 .get();
         return this.flowContext.registration(flow).register();
     }
-
     private void removeAdapter(String mqttId) {
         this.flowContext.remove(mqttId);    // 어댑터 삭제
+    }
+
+    @GetMapping("/")
+    @ApiOperation("전체 KIT 조회")
+    public ResponseEntity getAllKit() {
+        List<SmartFarm> farms = smartFarmRepository.findAll();
+        return new ResponseEntity(farms, HttpStatus.OK);
     }
 
     @PostMapping("/new")
     @ApiOperation("kit 동적 생성 ")
     public ResponseEntity newKit(@RequestParam String kitId) {
-        // 등록시 condition을 기본값으로
-            // id a5423b DB 저장하고
-        IntegrationFlowRegistration registration = addAdapter(kitId+"/json");
-        String id = registration.getId();
-        System.out.println("id="+ id);
-        SmartFarm smartFarm = new SmartFarm();
-        smartFarm.setId(4L);
-        smartFarm.setMqttAdapterId(kitId);
-        smartFarm.setBeanId(id);
-        smartFarm.setHumidityConditionValue(100);
-        smartFarm.setIlluminanceConditionValue(100);
-        smartFarm.setSoilHumidityConditionValue(100);
-        smartFarm.setTemperatureConditionValue(100);
-        smartFarmRepository.save(smartFarm);
-        return new ResponseEntity("키트 등록완료", HttpStatus.OK);
+        try {
+
+            SmartFarm smartFarm = new SmartFarm();
+            smartFarm.setId(Long.valueOf(kitId));
+            smartFarm.setHumidityConditionValue(100);
+            smartFarm.setIlluminanceConditionValue(100);
+            smartFarm.setSoilHumidityConditionValue(100);
+            smartFarm.setTemperatureConditionValue(100);
+
+            IntegrationFlowRegistration registration = addAdapter(kitId + "/json");
+            smartFarm.setMqttAdapterId(registration.getId());
+
+            smartFarmRepository.save(smartFarm);
+            return new ResponseEntity(kitId + " 키트 등록완료", HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @DeleteMapping("/delete") // TODO : KIT ID를 받아야함
     @ApiOperation("kid delete")
     public ResponseEntity deleteKit(@RequestParam String kitId) {
-        SmartFarm smartFarm = smartFarmRepository.findByMqttAdapterId(kitId)
-                .orElseThrow(()->{
-                    throw new RuntimeException("KitId가 존재하지 않음");
-        });
+        try {
+            SmartFarm smartFarm = smartFarmRepository.findById(Long.valueOf(kitId))
+                    .orElseThrow(()->{
+                        throw new RuntimeException("해당 키트가 존재하지 않습니다");
+                    });
 
-       removeAdapter(smartFarm.getBeanId());
-        // SmratFarm DB 데이터도 삭제
-        return new ResponseEntity("키트 삭제", HttpStatus.OK);
+            if (smartFarm.getMqttAdapterId() != null) {
+                removeAdapter(smartFarm.getMqttAdapterId());
+            }
+
+            smartFarmRepository.delete(smartFarm);
+            // SmratFarm DB 데이터도 삭제
+            return new ResponseEntity(kitId + " 키트 삭제완료", HttpStatus.OK);
+
+        } catch (RuntimeException e) {
+            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/{kit_id}")
     public ResponseEntity getKit(@PathVariable("kit_id") Long kitId) {
-        SmartFarm smartFarm = smartFarmRepository.findById(kitId).orElse(null);
-        return new ResponseEntity(smartFarm, HttpStatus.OK);
+        try {
+            SmartFarm smartFarm = smartFarmRepository.findById(kitId).orElseThrow(() -> {
+                throw new RuntimeException("해당 키트가 존재하지 않습니다");
+            });
+            return new ResponseEntity(smartFarm, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
-
-    // 대시보드에서 추가하는거는 작동중인 KIT 우리 서비스에 등록하는것.
-    // 작동중이 우리 서버로 연결에
-    // 비동기 -> 작동중인 KIT (ID Generated, a5423b) -> Broker -> Backend -> Fronm (Kit 등록 -> id : a5423b)
-    // KIT 고유아이디는
 
     @ApiOperation(value = "KIT ID를 가지는 키트의 알람 트리거 설정", notes = "type(센서 유형), value (트리거가 될 값) 현재는 온도 >= value 임 \n 즉 측정된 온도가 value 이상이면 알람 발생")
     @PostMapping("/alert/{kit_id}")
     public ResponseEntity setAlert(@PathVariable("kit_id") Long kitID,
                                    @RequestParam("type") String type,
                                    @RequestParam("value") int value) {
-        SmartFarm kit = smartFarmRepository.findById(kitID)
-                .orElseThrow(() -> {
-                    throw new RuntimeException("존재하지 않는 KIT");
-                });
-        boolean typeCheck = false;
-        if (type.equals("temperature")) {
-            kit.setTemperatureConditionValue(value);
-            typeCheck = true;
-        } else if (type.equals("soilhumidity")) {
-            kit.setSoilHumidityConditionValue(value);
-            typeCheck = true;
+        try {
+            SmartFarm kit = smartFarmRepository.findById(kitID)
+                    .orElseThrow(() -> {
+                        throw new RuntimeException("존재하지 않는 KIT");
+                    });
 
-        } else if (type.equals("illuminance")) {
-            kit.setIlluminanceConditionValue(value);
-            typeCheck = true;
+            boolean typeCheck = true;
+            if (type.equals("temperature")) {
+                kit.setTemperatureConditionValue(value);
+            } else if (type.equals("soilhumidity")) {
+                kit.setSoilHumidityConditionValue(value);
+            } else if (type.equals("illuminance")) {
+                kit.setIlluminanceConditionValue(value);
+            } else if (type.equals("humidity")) {
+                kit.setHumidityConditionValue(value);
+            } else {
+                throw new RuntimeException("잘못된 Type 입니다");
+            }
 
-        } else if (type.equals("humidity")) {
-            kit.setHumidityConditionValue(value);
-            typeCheck = true;
-        }
-
-        if (typeCheck) {
             smartFarmRepository.save(kit);
             sentToMqtt(kitID, type, value);
-        }
 
-        return new ResponseEntity(type + ":" + value + " 으로 지정됨", HttpStatus.OK);
+            return new ResponseEntity(type + ":" + value + " 으로 지정됨", HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/alert/{kit_id}")

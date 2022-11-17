@@ -3,11 +3,14 @@ package SpringBoot.Codebase.domain.entity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
 @Setter
 @Builder
+@Table(name = "smart_farm")
 @NoArgsConstructor
 @AllArgsConstructor
 public class SmartFarm { // 회원 FK, 농장주
@@ -28,6 +31,9 @@ public class SmartFarm { // 회원 FK, 농장주
     private String humidityCondition;
     private Integer humidityConditionValue;
 
+    @Column(nullable = false)
     private String mqttAdapterId;
-    private String beanId;
+
+    @OneToMany(mappedBy = "smartFarm", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Alert> alerts = new ArrayList<>();
 }

@@ -46,7 +46,6 @@ public class MqttConfiguration {
     private final String MQTT_PUB_CLIENT_ID = MqttAsyncClient.generateClientId();
     private final String TOPIC_FILTER;
 
-
     private final ActuatorService actuatorService;
     private final SensorService sensorService;
     private final AlertManager alertManager;
