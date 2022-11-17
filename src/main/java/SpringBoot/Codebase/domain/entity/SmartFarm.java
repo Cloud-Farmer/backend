@@ -29,5 +29,5 @@ public class SmartFarm { // 회원 FK, 농장주
     private Integer humidityConditionValue;
 
     private String mqttAdapterId;
-
+    private String beanId;
 }

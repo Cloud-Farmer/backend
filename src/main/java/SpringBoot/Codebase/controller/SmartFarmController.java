@@ -54,7 +54,6 @@ public class SmartFarmController {
         StandardIntegrationFlow flow = IntegrationFlows.from(adapter)
                 .channel(mqttInputChannel)
                 .get();
-        System.out.println(" = " + flowContext.getRegistry());
         return this.flowContext.registration(flow).register();
     }
 
@@ -69,9 +68,11 @@ public class SmartFarmController {
             // id a5423b DB 저장하고
         IntegrationFlowRegistration registration = addAdapter(kitId+"/json");
         String id = registration.getId();
+        System.out.println("id="+ id);
         SmartFarm smartFarm = new SmartFarm();
         smartFarm.setId(4L);
         smartFarm.setMqttAdapterId(kitId);
+        smartFarm.setBeanId(id);
         smartFarm.setHumidityConditionValue(100);
         smartFarm.setIlluminanceConditionValue(100);
         smartFarm.setSoilHumidityConditionValue(100);
@@ -87,9 +88,9 @@ public class SmartFarmController {
                 .orElseThrow(()->{
                     throw new RuntimeException("KitId가 존재하지 않음");
         });
-        int s = Integer.parseInt(smartFarm.getMqttAdapterId());
+
+       removeAdapter(smartFarm.getBeanId());
         // SmratFarm DB 데이터도 삭제
-        removeAdapter("org.springframework.integration.dsl.StandardIntegrationFlow#"+String.valueOf(s-1));
         return new ResponseEntity("키트 삭제", HttpStatus.OK);
     }
 
