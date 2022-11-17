@@ -5,6 +5,7 @@ import SpringBoot.Codebase.domain.entity.Alert;
 import SpringBoot.Codebase.domain.entity.SmartFarm;
 import SpringBoot.Codebase.domain.entity.dto.AlertListDto;
 import SpringBoot.Codebase.domain.entity.dto.AlertResponseDto;
+import SpringBoot.Codebase.domain.entity.dto.SmartFarmDto;
 import SpringBoot.Codebase.domain.repository.AlertRepository;
 import SpringBoot.Codebase.domain.repository.SmartFarmRepository;
 import io.swagger.annotations.ApiOperation;
@@ -63,9 +64,17 @@ public class SmartFarmController {
 
     @GetMapping("/")
     @ApiOperation("전체 KIT 조회")
-    public ResponseEntity getAllKit() {
-        List<SmartFarm> farms = smartFarmRepository.findAll();
-        return new ResponseEntity(farms, HttpStatus.OK);
+    public ResponseEntity getAllKit(int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<SmartFarm> farms = smartFarmRepository.findAll(pageRequest);
+        List<SmartFarmDto> smartFarmDtos = new ArrayList<>();
+
+        for (SmartFarm smartFarm : farms) {
+            SmartFarmDto dto = SmartFarmDto.of(smartFarm);
+            smartFarmDtos.add(dto);
+        }
+
+        return new ResponseEntity(smartFarmDtos, HttpStatus.OK);
     }
 
     @PostMapping("/new")
