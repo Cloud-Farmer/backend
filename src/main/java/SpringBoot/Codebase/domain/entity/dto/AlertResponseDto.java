@@ -13,7 +13,8 @@ public class AlertResponseDto {
 
     private String subject; // 알람 유형
 
-    private String message; // 알람 내용
+    private String messageKR; // 알람 내용
+    private String messageEng; // 알람 내용
 
     private String status; // 알람 상태
 
@@ -26,8 +27,8 @@ public class AlertResponseDto {
         AlertResponseDto alertResponseDto = new AlertResponseDto();
         alertResponseDto.setAlertedTime(alert.getAlertedTime());
         alertResponseDto.setStatus(alert.getStatus());
-        alertResponseDto.setLanguage(alert.getLanguage());
-        alertResponseDto.setMessage(alert.getMessage());
+        alertResponseDto.setMessageKR(alert.getMessageKR());
+        alertResponseDto.setMessageEng(alert.getMessageENG());
         alertResponseDto.setSubject(alert.getSubject());
         return alertResponseDto;
     }

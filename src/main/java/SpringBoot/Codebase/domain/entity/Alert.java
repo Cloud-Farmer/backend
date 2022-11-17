@@ -20,11 +20,12 @@ public class Alert {
 
     private String subject; // 알람 유형
 
-    private String message; // 알람 내용
+    private String messageKR; // 알람 내용
+
+    private String messageENG; // 알람 내용
 
     private String status; // 알람 상태
 
-    private String language; // 언어
 
     private LocalDateTime alertedTime;  // 시각
 

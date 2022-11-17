@@ -21,11 +21,12 @@ public class HumidiyChain implements AlertChain {
         if (object instanceof Humidity) {
             Humidity humidity = (Humidity) object;
             if (humidity.getValue() >= farm.getHumidityConditionValue()) {
-                String message = String.format("ID %s 키트의 습도가 %d 보다 높습니다", humidity.getKitId(), farm.getHumidityConditionValue());
+                String messageKr = String.format("ID %s 키트의 습도가 %d 보다 높습니다", humidity.getKitId(), farm.getHumidityConditionValue());
+                String messageEng = String.format("The humidity of %s kit is higher than %d", humidity.getKitId(), farm.getHumidityConditionValue());
 
                 Alert alert = Alert.builder()
-                        .language("kr")
-                        .message(message)
+                        .messageKR(messageKr)
+                        .messageENG(messageEng)
                         .status("warning")
                         .subject("humidity")
                         .smartFarm(farm)
