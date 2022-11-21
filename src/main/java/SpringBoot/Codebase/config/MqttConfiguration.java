@@ -105,7 +105,7 @@ public class MqttConfiguration {
         // DB에 저장된 키트 불러옴
         List<SmartFarm> farms = smartFarmRepository.findAll();
         for (SmartFarm smartFarm : farms) {
-            String topic = smartFarm.getId() + "/json";
+            String topic = smartFarm.getId() + "/#";
             adapter.addTopic(topic, 1);
             smartFarm.setMqttAdapterId("adapter control by server");
         }
@@ -126,62 +126,74 @@ public class MqttConfiguration {
             // 수신 받은 데이터 InfluxDB에 적재
             String kitId = token[0]; //kitId
             String type = token[1]; // actuator or sensor
-            JSONParser parser = new JSONParser();
-            try {
-                JSONObject object = (JSONObject) parser.parse(payload);
-                JSONObject sensor = (JSONObject) object.get("Sensor");
-                JSONObject actuator= (JSONObject) object.get("Actuator");
+            if(type.equals("autoValue")){
+                SmartFarm farm = smartFarmRepository.findById(Long.valueOf(kitId)).orElse(null);
+                if (farm!=null){
+                    farm.setAutoMode(Integer.valueOf(payload));
+                    smartFarmRepository.save(farm);
+                }
+                return ;
+            }
+            else if(type.equals("json")) {
 
-                Temperature temperature = new Temperature();
-                temperature.setValue(Float.valueOf(sensor.get("temperature").toString()));
-                temperature.setKitId(kitId);
-                sensorService.writeTemperature(temperature);
+                JSONParser parser = new JSONParser();
+                try {
+                    JSONObject object = (JSONObject) parser.parse(payload);
+                    JSONObject sensor = (JSONObject) object.get("Sensor");
+                    JSONObject actuator = (JSONObject) object.get("Actuator");
 
-                Illuminance illuminance = new Illuminance();
-                illuminance.setValue(Float.valueOf(sensor.get("illuminance").toString()));
-                illuminance.setKitId(kitId);
-                sensorService.writeCdc(illuminance);
+                    Temperature temperature = new Temperature();
+                    temperature.setValue(Float.valueOf(sensor.get("temperature").toString()));
+                    temperature.setKitId(kitId);
+                    sensorService.writeTemperature(temperature);
 
-                Humidity humidity = new Humidity();
-                humidity.setValue(Float.valueOf(sensor.get("humidity").toString()));
-                humidity.setKitId(kitId);
-                sensorService.writeHumidity(humidity);
+                    Illuminance illuminance = new Illuminance();
+                    illuminance.setValue(Float.valueOf(sensor.get("illuminance").toString()));
+                    illuminance.setKitId(kitId);
+                    sensorService.writeCdc(illuminance);
 
-                SoilHumidity soilHumidity = new SoilHumidity();
-                soilHumidity.setValue(Float.valueOf(sensor.get("soilhumidity").toString()));
-                soilHumidity.setKitId(kitId);
-                sensorService.writeSoil(soilHumidity);
+                    Humidity humidity = new Humidity();
+                    humidity.setValue(Float.valueOf(sensor.get("humidity").toString()));
+                    humidity.setKitId(kitId);
+                    sensorService.writeHumidity(humidity);
 
-                SmartFarm farm = smartFarmRepository.findById(Long.valueOf(kitId))
-                        .orElse(null);
+                    SoilHumidity soilHumidity = new SoilHumidity();
+                    soilHumidity.setValue(Float.valueOf(sensor.get("soilhumidity").toString()));
+                    soilHumidity.setKitId(kitId);
+                    sensorService.writeSoil(soilHumidity);
 
-                alertManager.run(farm,temperature);
-                alertManager.run(farm,illuminance);
-                alertManager.run(farm,humidity);
-                alertManager.run(farm,soilHumidity);
+                    SmartFarm farm = smartFarmRepository.findById(Long.valueOf(kitId))
+                            .orElse(null);
 
-                Window window = new Window();
-                window.setKitId(kitId);
-                window.setStatus(Float.valueOf(actuator.get("window").toString()));
-                actuatorService.writeWindow(window);
+                    alertManager.run(farm, temperature);
+                    alertManager.run(farm, illuminance);
+                    alertManager.run(farm, humidity);
+                    alertManager.run(farm, soilHumidity);
 
-                Led led = new Led();
-                led.setKitId(kitId);
-                led.setStatus(Float.valueOf(actuator.get("led").toString()));
-                actuatorService.writeLed(led);
+                    Window window = new Window();
+                    window.setKitId(kitId);
+                    window.setStatus(Float.valueOf(actuator.get("window").toString()));
+                    actuatorService.writeWindow(window);
 
-                Pump pump = new Pump();
-                pump.setKitId(kitId);
-                pump.setStatus(Float.valueOf(actuator.get("pump").toString()));
-                actuatorService.writePump(pump);
+                    Led led = new Led();
+                    led.setKitId(kitId);
+                    led.setStatus(Float.valueOf(actuator.get("led").toString()));
+                    actuatorService.writeLed(led);
 
-                Fan fan = new Fan();
-                fan.setKitId(kitId);
-                fan.setStatus(Float.valueOf(actuator.get("fan").toString()));
-                actuatorService.writeFan(fan);
+                    Pump pump = new Pump();
+                    pump.setKitId(kitId);
+                    pump.setStatus(Float.valueOf(actuator.get("pump").toString()));
+                    actuatorService.writePump(pump);
 
-            } catch (Exception e) {
-                e.printStackTrace();
+                    Fan fan = new Fan();
+                    fan.setKitId(kitId);
+                    fan.setStatus(Float.valueOf(actuator.get("fan").toString()));
+                    actuatorService.writeFan(fan);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
             }
         };
     }
