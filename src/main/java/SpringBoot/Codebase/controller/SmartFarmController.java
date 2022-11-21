@@ -172,6 +172,7 @@ public class SmartFarmController {
     }
 
     @GetMapping("/alert/{kit_id}")
+    @ApiOperation("kit 알람 설정")
     public ResponseEntity getAlertCondition(@PathVariable("kit_id") Long kitId, @RequestParam("page") int page, @RequestParam("size") int size) {
         SmartFarm smartFarm = smartFarmRepository.findById(kitId).orElse(null);
 
@@ -192,9 +193,29 @@ public class SmartFarmController {
 
         return new ResponseEntity(listDto, HttpStatus.OK);
     }
-
+    @PostMapping("/auto")
+    @ApiOperation("kit 센서 값 자동 제어 여부 수동/0, 자동/1")
+    public ResponseEntity autoMode(@RequestParam Long kitId, @RequestParam int value){
+        try{
+           SmartFarm smartFarm = smartFarmRepository.findById(kitId)
+                   .orElseThrow(()->{
+                     throw new RuntimeException("키트가 존재하지 않습니다.");
+                   });
+           sentToMqtt(kitId,value);
+           String mode = "자동 제어";
+           if(value==0) mode="수동 제어";
+           return new ResponseEntity(kitId+"번 "+mode,HttpStatus.OK);
+        }catch (RuntimeException e){
+            return new ResponseEntity("0 또는 1을 입력하세요",HttpStatus.BAD_REQUEST);
+        }
+    }
     public void sentToMqtt(Long kitId, String alertType, int value) {
         String topic = kitId + "/alertvalue/" + alertType;
         mqttOrderGateway.sendToMqtt(String.valueOf(value), topic);
     }
+    public void sentToMqtt(Long kitId,int value) {
+        String topic = kitId + "/auto";
+        mqttOrderGateway.sendToMqtt(String.valueOf(value), topic);
+    }
+
 }
