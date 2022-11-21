@@ -193,9 +193,9 @@ public class SmartFarmController {
 
         return new ResponseEntity(listDto, HttpStatus.OK);
     }
-    @PostMapping("/{kitId}/auto")
+    @PostMapping("/{kit_id}/auto")
     @ApiOperation("kit 센서 값 자동 제어 여부 수동/0, 자동/1")
-    public ResponseEntity autoMode(@PathVariable Long kitId, @RequestParam int value){
+    public ResponseEntity autoMode(@PathVariable("kit_id") Long kitId, @RequestParam int value){
         try{
            SmartFarm smartFarm = smartFarmRepository.findById(kitId)
                    .orElseThrow(()->{
@@ -217,15 +217,15 @@ public class SmartFarmController {
         String topic = kitId + "/auto";
         mqttOrderGateway.sendToMqtt(String.valueOf(value), topic);
     }
-    @GetMapping("/{kitId}/{sensor}/alert/{value}")
+    @GetMapping("/{kit_id}/{sensor}/alert/{value}")
     @ApiOperation("센서 별 알람 설정")
-    public ResponseEntity alertSensor(@PathVariable Long kitId, @PathVariable("sensor") String sensor,@PathVariable int value ){
+    public ResponseEntity alertSensor(@PathVariable("kit_id") Long kitId, @PathVariable("sensor") String sensor,@PathVariable("value") int value ){
         try{
             SmartFarm smartFarm = smartFarmRepository.findById(kitId)
                     .orElseThrow(()->{
                         throw new RuntimeException("키트가 존재하지 않습니다. ");
                     });
-            if(sensor.equals("humditiy"))
+            if(sensor.equals("humdity"))
                 smartFarm.setHumidityConditionValue(value);
             else if(sensor.equals("soilHumidity"))
                 smartFarm.setSoilHumidityConditionValue(value);
@@ -233,7 +233,7 @@ public class SmartFarmController {
                 smartFarm.setIlluminanceConditionValue(value);
             else if(sensor.equals("temperature"))
                 smartFarm.setTemperatureConditionValue(value);
-            return new ResponseEntity(kitId+"번 키트 "+sensor+" 센서 알람"+value+" 설정",HttpStatus.OK);
+            return new ResponseEntity(kitId+"번 키트 "+sensor+" 센서 알람 "+value+" 설정",HttpStatus.OK);
         }catch (RuntimeException e){
             return new ResponseEntity("해당 센서가 존재하지 않습니다.",HttpStatus.BAD_REQUEST);
         }
