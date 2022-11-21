@@ -32,6 +32,8 @@ public class SmartFarm { // 회원 FK, 농장주
     private String humidityCondition;
     private Integer humidityConditionValue;
 
+    private Integer autoMode;
+
     @Column(nullable = false)
     private String mqttAdapterId;
 
