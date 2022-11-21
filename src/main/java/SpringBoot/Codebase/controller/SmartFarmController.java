@@ -194,7 +194,7 @@ public class SmartFarmController {
         return new ResponseEntity(listDto, HttpStatus.OK);
     }
     @PostMapping("/{kit_id}/auto")
-    @ApiOperation("kit 센서 값 자동 제어 여부 수동/0, 자동/1")
+    @ApiOperation(value="kit 센서 값 자동/수동 제어 토픽 발행",notes="수동=0, 자동=1")
     public ResponseEntity autoMode(@PathVariable("kit_id") Long kitId, @RequestParam int value){
         try{
            SmartFarm smartFarm = smartFarmRepository.findById(kitId)
@@ -219,6 +219,7 @@ public class SmartFarmController {
     }
 
     @GetMapping("/{kit_id}/auto")
+    @ApiOperation("해당 키트의 auto 상태 가져오기")
     public ResponseEntity getAutoMode(@PathVariable("kit_id")Long kitId){
         try{
             SmartFarm smartFarm = smartFarmRepository.findById(kitId)
@@ -228,7 +229,7 @@ public class SmartFarmController {
 
             return new ResponseEntity(smartFarm.getAutoMode(),HttpStatus.OK);
         }catch (RuntimeException e){
-            return new ResponseEntity("",HttpStatus.BAD_REQUEST);
+            return new ResponseEntity("잘못된 조회",HttpStatus.BAD_REQUEST);
         }
     }
 
