@@ -93,6 +93,7 @@ public class SmartFarmController {
             smartFarm.setSoilHumidityConditionValue(100);
             smartFarm.setTemperatureConditionValue(100);
             smartFarm.setCreatedTime(LocalDateTime.now());
+            smartFarm.setAutoMode(0);
 
             IntegrationFlowRegistration registration = addAdapter(kitId + "/json");
             smartFarm.setMqttAdapterId(registration.getId());
@@ -132,7 +133,7 @@ public class SmartFarmController {
             SmartFarm smartFarm = smartFarmRepository.findById(kitId).orElseThrow(() -> {
                 throw new RuntimeException("해당 키트가 존재하지 않습니다");
             });
-            return new ResponseEntity(smartFarm, HttpStatus.OK);
+            return new ResponseEntity(SmartFarmDto.of(smartFarm), HttpStatus.OK);
         } catch (RuntimeException e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -141,7 +142,7 @@ public class SmartFarmController {
     @ApiOperation(value = "KIT ID를 가지는 키트의 알람 트리거 설정", notes = "type(센서 유형), value (트리거가 될 값) 현재는 온도 >= value 임 \n 즉 측정된 온도가 value 이상이면 알람 발생")
     @PostMapping("/alert/{kit_id}")
     public ResponseEntity setAlert(@PathVariable("kit_id") Long kitID,
-                                   @RequestParam("type") String type,
+                                   @RequestParam("sensor") String sensor,
                                    @RequestParam("value") int value) {
         try {
             SmartFarm kit = smartFarmRepository.findById(kitID)
@@ -149,30 +150,29 @@ public class SmartFarmController {
                         throw new RuntimeException("존재하지 않는 KIT");
                     });
 
-            boolean typeCheck = true;
-            if (type.equals("temperature")) {
+            if (sensor.equals("temperature")) {
                 kit.setTemperatureConditionValue(value);
-            } else if (type.equals("soilhumidity")) {
+            } else if (sensor.equals("soilhumidity")) {
                 kit.setSoilHumidityConditionValue(value);
-            } else if (type.equals("illuminance")) {
+            } else if (sensor.equals("illuminance")) {
                 kit.setIlluminanceConditionValue(value);
-            } else if (type.equals("humidity")) {
+            } else if (sensor.equals("humidity")) {
                 kit.setHumidityConditionValue(value);
             } else {
-                throw new RuntimeException("잘못된 Type 입니다");
+                throw new RuntimeException("잘못된 Sensor 입니다");
             }
 
             smartFarmRepository.save(kit);
-            sentToMqtt(kitID, type, value);
+            sentToMqtt(kitID, sensor, value);
 
-            return new ResponseEntity(type + ":" + value + " 으로 지정됨", HttpStatus.OK);
+            return new ResponseEntity(sensor + ":" + value + " 으로 지정됨", HttpStatus.OK);
         } catch (RuntimeException e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
     @GetMapping("/alert/{kit_id}")
-    @ApiOperation("kit 알람 설정")
+    @ApiOperation("kit 알람 로그 가져오기")
     public ResponseEntity getAlertCondition(@PathVariable("kit_id") Long kitId, @RequestParam("page") int page, @RequestParam("size") int size) {
         SmartFarm smartFarm = smartFarmRepository.findById(kitId).orElse(null);
 
@@ -202,13 +202,37 @@ public class SmartFarmController {
                      throw new RuntimeException("키트가 존재하지 않습니다.");
                    });
            sentToMqtt(kitId,value);
-           String mode = "자동 제어";
-           if(value==0) mode="수동 제어";
-           return new ResponseEntity(kitId+"번 "+mode,HttpStatus.OK);
+            String mode = "";
+            if (value==1){
+                mode ="자동 제어";
+            }
+            else if (value == 0) {
+                mode="수동 제어";
+            }
+            else{
+                throw new RuntimeException("잘못된 요청입니다.");
+            }
+            return new ResponseEntity(kitId+"번 "+mode +" 활성화됨",HttpStatus.OK);
         }catch (RuntimeException e){
             return new ResponseEntity("0 또는 1을 입력하세요",HttpStatus.BAD_REQUEST);
         }
     }
+
+    @GetMapping("/{kit_id}/auto")
+    public ResponseEntity getAutoMode(@PathVariable("kit_id")Long kitId){
+        try{
+            SmartFarm smartFarm = smartFarmRepository.findById(kitId)
+                    .orElseThrow(()->{
+                        throw new RuntimeException("키트가 존재하지 않습니다.");
+                    });
+
+            return new ResponseEntity(smartFarm.getAutoMode(),HttpStatus.OK);
+        }catch (RuntimeException e){
+            return new ResponseEntity("",HttpStatus.BAD_REQUEST);
+        }
+    }
+
+
     public void sentToMqtt(Long kitId, String alertType, int value) {
         String topic = kitId + "/alertvalue/" + alertType;
         mqttOrderGateway.sendToMqtt(String.valueOf(value), topic);
@@ -216,26 +240,5 @@ public class SmartFarmController {
     public void sentToMqtt(Long kitId,int value) {
         String topic = kitId + "/auto";
         mqttOrderGateway.sendToMqtt(String.valueOf(value), topic);
-    }
-    @GetMapping("/{kit_id}/{sensor}/alert/{value}")
-    @ApiOperation("센서 별 알람 설정")
-    public ResponseEntity alertSensor(@PathVariable("kit_id") Long kitId, @PathVariable("sensor") String sensor,@PathVariable("value") int value ){
-        try{
-            SmartFarm smartFarm = smartFarmRepository.findById(kitId)
-                    .orElseThrow(()->{
-                        throw new RuntimeException("키트가 존재하지 않습니다. ");
-                    });
-            if(sensor.equals("humdity"))
-                smartFarm.setHumidityConditionValue(value);
-            else if(sensor.equals("soilHumidity"))
-                smartFarm.setSoilHumidityConditionValue(value);
-            else if(sensor.equals("illuminance"))
-                smartFarm.setIlluminanceConditionValue(value);
-            else if(sensor.equals("temperature"))
-                smartFarm.setTemperatureConditionValue(value);
-            return new ResponseEntity(kitId+"번 키트 "+sensor+" 센서 알람 "+value+" 설정",HttpStatus.OK);
-        }catch (RuntimeException e){
-            return new ResponseEntity("해당 센서가 존재하지 않습니다.",HttpStatus.BAD_REQUEST);
-        }
     }
 }
