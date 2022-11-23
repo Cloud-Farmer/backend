@@ -157,6 +157,7 @@ public class ActuatorService {
         WriteApiBlocking writeApi = influxDBClient.getWriteApiBlocking();
         ZonedDateTime time = Instant.now().atZone(ZoneId.of("Asia/Seoul"));
         String flux = String.format("from(bucket:\"smartfarm\")|> range(start: -%s, stop: now())" +
+                        "|> timeShift(duration: 9h)" +
                         " |> filter(fn: (r) => r[\"_measurement\"] == \"%s\")" +
                         "|> filter(fn: (r) => r[\"kitid\"] == \"%s\")" +
                         "|> aggregateWindow(every: 1h, fn: mean, createEmpty: false)" + // 1h 단위로 묶음
@@ -176,6 +177,7 @@ public class ActuatorService {
         WriteApiBlocking writeApi = influxDBClient.getWriteApiBlocking();
         ZonedDateTime time = Instant.now().atZone(ZoneId.of("Asia/Seoul"));
         String flux = String.format("from(bucket:\"smartfarm\")|> range(start:-1m)" +
+                        "|> timeShift(duration: 9h)" +
                         " |> filter(fn: (r) => r[\"_measurement\"] == \"%s\")" +
                         "|> filter(fn: (r) => r[\"kitid\"] == \"%s\")" +
                         "|> aggregateWindow(every: 1h, fn: last, createEmpty: false)" +
