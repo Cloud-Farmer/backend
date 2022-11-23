@@ -1,7 +1,7 @@
 version: '3.8'
 services:
-  backend:
-    image: smartfarm-backend:0.0.5
+  smartfarm-backend:
+    image: smartfarm-backend:0.1
     ports:
       - "18081:8080"
     restart: always
@@ -9,39 +9,11 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://203.241.228.50:13307/smartfarm?useSSL=false&serverTimezone=Asia/Seoul&useLegacyDatetimeCode=false
       SPRING_DATASOURCE_USERNAME: "root"
       SPRING_DATASOURCE_PASSWORD: "mega123"
-
-  influxdb:
-    image: influxdb:2.2-alpine
+  smartfarm-frontend:
+    image: jadru/smartfarm-dashboard:1.0
     ports:
-      - "8086:8086"
+      - "3001:3000"
+    restart: always
     environment:
-      - DOCKER_INFLUXDB_INIT_MODE=setup
-      - DOCKER_INFLUXDB_INIT_USERNAME=mega
-      - DOCKER_INFLUXDB_INIT_PASSWORD=mega123!@#
-      - DOCKER_INFLUXDB_INIT_BUCKET=smartfarm
-      - DOCKER_INFLUXDB_INIT_ORG=95f96cb422f582d3
-      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=oSghfVuohVj8bD8cgPx_Ros-9cnYT4XKhIMSEETCxkBQRR3HQtfNLjm9QeR9EV7sQMd0_b151HGDHdL3YTdBNQ==
-    volumes:
-      - ./influxdb:/var/lib/influxdb
-#  mysql:
-#    container_name: mysql5.7
-#    image: library/mysql:5.7
-#    platform: linux/amd64
-#    volumes:
-#      - db_datas:/var/lib/mysql
-#      - ./db/mysql/init:/docker-entrypoint-initdb.d
-#    hostname: mysql
-#    environment:
-#      MYSQL_DATABASE: smartfarm
-#      MYSQL_ROOT_PASSWORD: mega123
-#      MYSQL_ROOT_HOST: '%'
-#      TZ: Asia/Seoul
-#    command:
-#      - --character-set-server=utf8mb4
-#      - --collation-server=utf8mb4_unicode_ci
-#    ports:
-#      - "13307:3306"
-
-volumes:
-  influxdb_data:
-  db_datas:
+      VITE_APP_API_URL: http://203.241.228.50:18081/api
+      VITE_WEATHER_API_URL: http://apis.data.go.kr/1360000
