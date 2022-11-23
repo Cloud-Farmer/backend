@@ -139,7 +139,7 @@ public class SmartFarmController {
         }
     }
 
-    @ApiOperation(value = "KIT ID를 가지는 키트의 알람 트리거 설정", notes = "type(센서 유형), value (트리거가 될 값) 현재는 온도 >= value 임 \n 즉 측정된 온도가 value 이상이면 알람 발생")
+    @ApiOperation(value = "KIT ID를 가지는 sensor의 알람 트리거 설정", notes = "sensor(센서 유형), value (트리거가 될 값) 현재는 온도 >= value 임 \n 즉 측정된 온도가 value 이상이면 알람 발생")
     @PostMapping("/alert/{kit_id}")
     public ResponseEntity setAlert(@PathVariable("kit_id") Long kitID,
                                    @RequestParam("sensor") String sensor,
@@ -165,7 +165,7 @@ public class SmartFarmController {
             smartFarmRepository.save(kit);
             sentToMqtt(kitID, sensor, value);
 
-            return new ResponseEntity(sensor + ":" + value + " 으로 지정됨", HttpStatus.OK);
+            return new ResponseEntity(sensor + "가" + value + "이상이면 알람이 발생됨", HttpStatus.OK);
         } catch (RuntimeException e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
