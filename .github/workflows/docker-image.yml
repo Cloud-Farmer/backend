@@ -2,9 +2,7 @@ name: Docker
 
 on:
   push:
-    branches: 
-    - develop
-    - 'feat/**'
+    branches: ["develop"]
     # Publish semver tags as releases.
     tags: ["*.*"]
   pull_request:
