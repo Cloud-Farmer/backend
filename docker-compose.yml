@@ -17,3 +17,4 @@ services:
     environment:
       VITE_APP_API_URL: http://203.241.228.50:18081/api
       VITE_WEATHER_API_URL: http://apis.data.go.kr/1360000
+      
