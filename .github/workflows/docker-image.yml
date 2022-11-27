@@ -11,11 +11,6 @@ on:
   pull_request:
     branches: ["develop"]
 
-env:
-  # Use docker.io for Docker Hub if empty
-  REGISTRY: docker.io
-  # github.repository as <account>/<repo>
-  IMAGE_NAME: moon1257/smartfarm-be
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -43,7 +38,7 @@ jobs:
         id: docker_meta
         uses: crazy-max/ghaction-docker-meta@v1
         with:
-          images: moon1257/spring
+          images: moon1257/smartfarm-be
           tag-semver: |
             {{version}}
             {{major}}.{{minor}}
