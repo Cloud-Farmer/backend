@@ -1,13 +1,4 @@
 FROM openjdk:11
-
-ARG JAVA_OPTS
-
-ENV JAVA_OPTS=$JAVA_OPTS
-
-RUN ls
-
-COPY build/libs/Codebase-0.0.1-SNAPSHOT.jar codebase.jar
-
-EXPOSE 8080
-
-ENTRYPOINT exec java $JAVA_OPTS -jar codebase.jar
+ARG JAR_FILE=*.jar
+COPY ${JAR_FILE} app.jar
+ENTRYPOINT ["java","-jar","/app.jar"]
