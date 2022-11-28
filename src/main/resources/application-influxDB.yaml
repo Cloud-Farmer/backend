@@ -1,0 +1,9 @@
+spring:
+  influxdb2:
+    url: http://203.241.228.50:8086
+    username: mega
+    password: mega123!@#
+    bucket: smartfarm
+    token: 5lq71v_GPftRSk2yUMiE7kDDt4qw1YrMYptnl2ooYOofzc5y8LYDUhEbEcP8SMkWJresG5WZZ_8ogeQ6CUDZMg==
+    org: 9c0b9dcf5e1b765d
+    retention-policy: autogen

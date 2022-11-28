@@ -1,5 +1,0 @@
-mqtt:
-  url: tcp://192.168.0.37
-  port: 1883
-  qos: 1
-  topic: "CloudFarm1/sensor/#"

@@ -1,9 +1,0 @@
-spring:
-  mvc:
-    pathmatch:
-      matching-strategy: ant_path_matcher
-  config:
-    import:
-    - application-influxDB.properties
-    - application-mysql.properties
-    - application-mqtt.yaml
