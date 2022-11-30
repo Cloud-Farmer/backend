@@ -41,4 +41,5 @@ public class SmartFarm { // 회원 FK, 농장주
 
     @OneToMany(mappedBy = "smartFarm", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Alert> alerts = new ArrayList<>();
+    
 }
