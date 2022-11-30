@@ -50,18 +50,6 @@ public class SensorService {
                 .time(Instant.from(time), WritePrecision.MS);
         writeApi.writePoint(point);
 
-        String flux = "from(bucket:\"smartfarm\") |> range(start: 0)" +
-                "|> filter(fn: (r) => r[\"_measurement\"] == \"temperature\")";
-
-        QueryApi queryApi = influxDBClient.getQueryApi();
-
-        List<FluxTable> tables = queryApi.query(flux);
-        for (FluxTable fluxTable : tables) {
-            List<FluxRecord> records = fluxTable.getRecords();
-            for (FluxRecord fluxRecord : records) {
-                if(fluxRecord.getValue() ==null) continue;
-            }
-        }
     }
 
     public void writeHumidity(Humidity humidity) {
@@ -75,18 +63,6 @@ public class SensorService {
                 .time(Instant.from(time), WritePrecision.MS);
         writeApi.writePoint(point);
 
-        String flux = "from(bucket:\"smartfarm\") |> range(start: 0)" +
-                "|> filter(fn: (r) => r[\"_measurement\"] == \"humidity\")";
-
-        QueryApi queryApi = influxDBClient.getQueryApi();
-
-        List<FluxTable> tables = queryApi.query(flux);
-        for (FluxTable fluxTable : tables) {
-            List<FluxRecord> records = fluxTable.getRecords();
-            for (FluxRecord fluxRecord : records) {
-                if(fluxRecord.getValue() ==null) continue;
-            }
-        }
     }
 
     public void writeCdc(Illuminance illuminance) {
@@ -99,19 +75,6 @@ public class SensorService {
                 .addField("value", illuminance.getValue())
                 .time(Instant.from(time), WritePrecision.MS);
         writeApi.writePoint(point);
-
-        String flux = "from(bucket:\"smartfarm\") |> range(start: 0)" +
-                "|> filter(fn: (r) => r[\"_measurement\"] == \"illuminance\")";
-
-        QueryApi queryApi = influxDBClient.getQueryApi();
-
-        List<FluxTable> tables = queryApi.query(flux);
-        for (FluxTable fluxTable : tables) {
-            List<FluxRecord> records = fluxTable.getRecords();
-            for (FluxRecord fluxRecord : records) {
-                if(fluxRecord.getValue() ==null) continue;
-            }
-        }
     }
 
     public void writeSoil(SoilHumidity soil) {
@@ -125,24 +88,11 @@ public class SensorService {
                 .time(Instant.from(time), WritePrecision.MS);
         writeApi.writePoint(point);
 
-        String flux = "from(bucket:\"smartfarm\") |> range(start: 0)" +
-                "|> filter(fn: (r) => r[\"_measurement\"] == \"soilHumidity\")";
-
-        QueryApi queryApi = influxDBClient.getQueryApi();
-
-        List<FluxTable> tables = queryApi.query(flux);
-        for (FluxTable fluxTable : tables) {
-            List<FluxRecord> records = fluxTable.getRecords();
-            for (FluxRecord fluxRecord : records) {
-                if(fluxRecord.getValue() ==null) continue;
-            }
-        }
     }
 
     public List<FluxRecord> selectDataSensor(String kitId, String sensor, String date) {
         InfluxDBClient influxDBClient = InfluxDBClientFactory.create(url,token,org,bucket);
-        WriteApiBlocking writeApi = influxDBClient.getWriteApiBlocking();
-        ZonedDateTime time = Instant.now().atZone(ZoneId.of("Asia/Seoul"));
+
         String flux = String.format("from(bucket:\"smartfarm\")|> range(start: -%s, stop: now())" +
                         " |> filter(fn: (r) => r[\"_measurement\"] == \"%s\")" +
                          "|> filter(fn: (r) => r[\"kitid\"] == \"%s\")" +
