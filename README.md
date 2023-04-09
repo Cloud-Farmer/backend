@@ -5,7 +5,7 @@
 ## Tech Stack
 
 - `Java`
-- 'Spring Boot'
+- `Spring Boot`
 - `MySQL`
 - `InFluxDB 2`
 - `Spring Data JPA`
@@ -14,10 +14,10 @@
 ### Deployment
 
 - `Docker`
-<img src="https://user-images.githubusercontent.com/45040095/230765843-b9c6ced2-4a51-44d7-934d-cf54d3efbd26.png" width="600" height="400">
+<img src="https://user-images.githubusercontent.com/45040095/230765843-b9c6ced2-4a51-44d7-934d-cf54d3efbd26.png" width="900" height="400">
 
 ## System Architechure
-<img src="https://user-images.githubusercontent.com/45040095/230765941-c81c5c9b-2817-42ba-a15d-5cb5eaba5f66.png" width="600" height="400">
+<img src="https://user-images.githubusercontent.com/45040095/230765941-c81c5c9b-2817-42ba-a15d-5cb5eaba5f66.png" width="900" height="400">
 
 ## API 명세서
 <img src="https://user-images.githubusercontent.com/45040095/230766053-f11a5a9d-df21-4b66-8271-019ca3132de0.png" width="900" height="200">
