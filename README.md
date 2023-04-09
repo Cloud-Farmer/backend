@@ -19,13 +19,10 @@
 
 ## System Architechure
 <img src="https://user-images.githubusercontent.com/45040095/230765941-c81c5c9b-2817-42ba-a15d-5cb5eaba5f66.png" width="600" height="400">
-![2](https://user-images.githubusercontent.com/45040095/230765988-451c5935-9658-450c-83d4-a847ac1a9184.png)
 
-### 프로젝트 구성
 
----
-
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/76c38515-8f1f-4c44-a18b-22d3271b36a1/Untitled.png)
+## 프로젝트 구성
+<img src="https://user-images.githubusercontent.com/45040095/230766018-7fc385bc-6c50-4971-b4a5-647c1aa9185f.png" width="600" height="400">
 
 ### API 명세서
 
