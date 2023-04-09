@@ -19,6 +19,7 @@
 
 ## System Architechure
 <img src="https://user-images.githubusercontent.com/45040095/230765941-c81c5c9b-2817-42ba-a15d-5cb5eaba5f66.png" width="600" height="400">
+![2](https://user-images.githubusercontent.com/45040095/230765988-451c5935-9658-450c-83d4-a847ac1a9184.png)
 
 ### 프로젝트 구성
 
