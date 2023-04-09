@@ -18,7 +18,7 @@
 <img src="https://user-images.githubusercontent.com/45040095/230765843-b9c6ced2-4a51-44d7-934d-cf54d3efbd26.png" width="600" height="400">
 
 ## System Architechure
-<img src="https://user-images.githubusercontent.com/45040095/230765941-c81c5c9b-2817-42ba-a15d-5cb5eaba5f66.png" width="600" height="200">
+<img src="https://user-images.githubusercontent.com/45040095/230765941-c81c5c9b-2817-42ba-a15d-5cb5eaba5f66.png" width="600" height="400">
 
 
 ## 프로젝트 구성
@@ -34,7 +34,7 @@
 
 InFluxDB 2.2 CLI
 
-<img src="https://user-images.githubusercontent.com/45040095/230766136-f51909e2-533a-402b-a03f-16c3f262275e.png" width="900" height=400">
+<img src="https://user-images.githubusercontent.com/45040095/230766222-fb3398cb-9274-4804-b1e6-32e93c38ffc5.png" width="900" height=400">
 
 MySQL 5.7 
 
