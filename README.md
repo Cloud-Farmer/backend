@@ -34,7 +34,7 @@
 
 InFluxDB 2.2 CLI
 
-<img src="https://user-images.githubusercontent.com/45040095/230766136-f51909e2-533a-402b-a03f-16c3f262275e.png" width="900" height=4200">
+<img src="https://user-images.githubusercontent.com/45040095/230766136-f51909e2-533a-402b-a03f-16c3f262275e.png" width="900" height=400">
 
 MySQL 5.7 
 
