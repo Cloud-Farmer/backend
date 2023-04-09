@@ -1,12 +1,8 @@
 # SmartFarm - Backend
 
----
-
 스마트팜 백엔드 서버
 
 ## Tech Stack
-
----
 
 - `Java`
 - `MySQL 5.7`  - Member 관리
@@ -19,13 +15,10 @@
 ### Deployment
 
 - `Docker`
-
-
-### System Architechure
 <img src="https://user-images.githubusercontent.com/45040095/230765843-b9c6ced2-4a51-44d7-934d-cf54d3efbd26.png" width="600" height="400">
 
-
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/4b6efb94-8ca3-44d6-931d-9e2d59566465/Untitled.png)
+## System Architechure
+<img src="https://s3-us-west-2.amazonaws.com/secure.notion-static.com/4b6efb94-8ca3-44d6-931d-9e2d59566465/Untitled.png" width="600" height="400">
 
 ### 프로젝트 구성
 
