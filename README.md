@@ -25,8 +25,8 @@
 <img src="https://user-images.githubusercontent.com/45040095/230766018-7fc385bc-6c50-4971-b4a5-647c1aa9185f.png" width="600" height="600">
 
 ## API 명세서
-<img src="https://user-images.githubusercontent.com/45040095/230766053-f11a5a9d-df21-4b66-8271-019ca3132de0.png" width="400" height="900">
-<img src="https://user-images.githubusercontent.com/45040095/230766060-c044e7b7-f4a5-4235-b5bb-1eebf5e7f189.png" width="400" height="900">
+<img src="https://user-images.githubusercontent.com/45040095/230766053-f11a5a9d-df21-4b66-8271-019ca3132de0.png" width="900" height="400">
+<img src="https://user-images.githubusercontent.com/45040095/230766060-c044e7b7-f4a5-4235-b5bb-1eebf5e7f189.png" width="900" height="400">
 
 
 ### Database
