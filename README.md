@@ -5,12 +5,11 @@
 ## Tech Stack
 
 - `Java`
-- `MySQL 5.7`  - Member 관리
-- `InFluxDB 2.2` - Sensor Data
-- `JPA`
-- `Lombok`
-- `Spring Web`
-- `Swagger -ui 3`
+- 'Spring Boot'
+- `MySQL`
+- `InFluxDB 2`
+- `Spring Data JPA`
+- `Swagger Docs`
 
 ### Deployment
 
