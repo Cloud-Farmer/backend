@@ -29,21 +29,15 @@
 <img src="https://user-images.githubusercontent.com/45040095/230766060-c044e7b7-f4a5-4235-b5bb-1eebf5e7f189.png" width="900" height="200">
 
 
-### Database
-
-
----
-
-![InFluxDB 2.2 CLI](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/64c0f48f-d768-4906-b4ed-ca782a7b96a4/Untitled.png)
+## Database
+<img src="https://user-images.githubusercontent.com/45040095/230766121-7534db25-1844-4d80-ba0d-cb47014e8db4.png" width="900" height="400">
 
 InFluxDB 2.2 CLI
 
-![MySQL 5.7 ](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/d3a86afc-75a4-43ed-a4eb-d90295bbc4a7/Untitled.png)
+<img src="https://user-images.githubusercontent.com/45040095/230766136-f51909e2-533a-402b-a03f-16c3f262275e.png" width="900" height=4200">
 
 MySQL 5.7 
 
-### Class Diagram
+## Class Diagram
+<img src="https://user-images.githubusercontent.com/45040095/230766152-0d5faa8b-1c7a-4bd4-ab40-b16eea967509.png" width="900" height="400">
 
----
-
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/8f21c263-8ec0-4ee5-97fe-9d5450a97a4c/Untitled.png)
